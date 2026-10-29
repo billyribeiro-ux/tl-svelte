@@ -1,0 +1,8 @@
+{
+	"framework": null,
+	"installCommand": "pnpm install",
+	"buildCommand": "pnpm exec turbo run build",
+	"outputDirectory": "build",
+	"rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+	"ignoreCommand": "bash ../../internal/scripts/vercel/should-build-template.sh workflow"
+}

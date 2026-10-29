@@ -1,0 +1,145 @@
+---
+title: Editor
+status: published
+author: steveruizok
+date: 3/22/2023
+order: 1
+keywords:
+  - editor
+  - control
+  - api
+  - class
+---
+
+The [Editor](?) class is the main way of controlling svelte-draw's editor. You can use it to manage the editor's internal state, make changes to the document, or respond to changes that have occurred.
+
+By design, the editor's surface area is very large. Almost everything is available through it. Need to create some shapes? Use [Editor#createShapes](?). Need to delete them? Use [Editor#deleteShapes](?). Need a sorted array of every shape on the current page? Use [Editor#getCurrentPageShapesSorted](?).
+
+## Accessing the editor
+
+You can access the editor in two ways:
+
+### The onMount callback
+
+The [SvelteDraw](?) component's `onMount` callback provides the editor as the first argument.
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+</script>
+
+<SvelteDraw
+	onMount={(editor) => {
+		// your editor code here
+	}}
+/>
+```
+
+### The getEditor function
+
+The `getEditor()` function returns the editor instance from Svelte context. Call it while a component initializes, from a component rendered inside [SvelteDraw](?) (or [SvelteDrawEditor](?)).
+
+```svelte
+<!-- InsideOfContext.svelte -->
+<script lang="ts">
+	import { getEditor } from 'svelte-draw'
+
+	const editor = getEditor()
+	// your editor code here
+</script>
+```
+
+```svelte
+<!-- App.svelte -->
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+	import InsideOfContext from './InsideOfContext.svelte'
+</script>
+
+<SvelteDraw>
+	<InsideOfContext />
+</SvelteDraw>
+```
+
+> If you're using the subcomponents as shown in [this example](/examples/configuration/exploded), the editor instance is provided by the [SvelteDrawEditor](?) component.
+
+## Reactive state
+
+The editor's state is reactive. Methods like [Editor#getSelectedShapeIds](?) or [Editor#getCurrentPageShapes](?) return values that automatically update when the underlying data changes. Svelte does not track these reads on its own, so bridge them into your components with `fromComputed` (or `fromSignal`), which return an object whose `.current` is reactive.
+
+```svelte
+<script lang="ts">
+	import { fromComputed, getEditor } from 'svelte-draw'
+
+	const editor = getEditor()
+	const selectedCount = fromComputed('selected count', () => editor.getSelectedShapeIds().length)
+	const toolId = fromComputed('current tool', () => editor.getCurrentToolId())
+</script>
+
+<div>{selectedCount.current}</div>
+<div>{toolId.current}</div>
+```
+
+See the [Signals](/sdk-features/signals) article for more on svelte-draw's reactive state system.
+
+## Batching changes
+
+Each change to the editor happens within a transaction. You can batch multiple changes into a single transaction using the [Editor#run](?) method. Batching groups the changes into a single undo step and reduces overhead for persisting or distributing changes.
+
+```ts
+// myShapes is an array of shape partials, each with an id from createShapeId()
+editor.run(() => {
+	editor.createShapes(myShapes)
+	editor.sendToBack(myShapes.map((shape) => shape.id))
+	editor.selectNone()
+})
+```
+
+The `run` method also accepts options to control history and locked shape behavior. Set `history` to `'ignore'` to leave undo/redo alone, or `'record-preserveRedoStack'` to record without clearing the redo stack:
+
+```ts
+// Make changes without affecting undo/redo history
+editor.run(
+	() => {
+		editor.createShapes(myShapes)
+	},
+	{ history: 'ignore' }
+)
+
+// Make changes to locked shapes
+editor.run(
+	() => {
+		editor.updateShapes(myLockedShapes)
+	},
+	{ ignoreShapeLock: true }
+)
+```
+
+## Capabilities
+
+The editor's methods and properties are organized around these areas:
+
+| Area          | Topic                                              | Description                                      |
+| ------------- | -------------------------------------------------- | ------------------------------------------------ |
+| Data          | [Signals](/sdk-features/signals)                   | Reactive state primitives                        |
+|               | [Store](/sdk-features/store)                       | The reactive database holding all records        |
+|               | [Shapes](/sdk-features/shapes)                     | Create, read, update, and delete shapes          |
+|               | [Bindings](/sdk-features/bindings)                 | Relationships between shapes                     |
+|               | [Pages](/sdk-features/pages)                       | Manage document pages                            |
+|               | [Assets](/sdk-features/assets)                     | Images, videos, and other media                  |
+| Interaction   | [Tools](/sdk-features/tools)                       | The state machine that handles user input        |
+|               | [Selection](/sdk-features/selection)               | Manage which shapes are selected                 |
+|               | [Input handling](/sdk-features/input-handling)     | Pointer and keyboard state                       |
+|               | [Events](/sdk-features/events)                     | Subscribe to user interactions and state changes |
+| View          | [Camera](/sdk-features/camera)                     | Control viewport position and zoom               |
+|               | [Coordinates](/sdk-features/coordinates)           | Convert between screen and page space            |
+| State         | [Instance state](/sdk-features/instance-state)     | Per-editor settings like current tool and focus  |
+|               | [Visibility](/sdk-features/visibility)             | Control which shapes are shown                   |
+|               | [History](/sdk-features/history)                   | Undo, redo, and history management               |
+|               | [Side effects](/sdk-features/side-effects)         | React to record lifecycle changes                |
+| Configuration | [User preferences](/sdk-features/user-preferences) | Cross-instance settings like dark mode           |
+|               | [Readonly mode](/sdk-features/readonly)            | Disable editing                                  |
+|               | [Locked shapes](/sdk-features/locked-shapes)       | Prevent changes to specific shapes               |
+| Output        | [Image export](/sdk-features/image-export)         | Export to SVG, PNG, and other formats            |
+
+See the [Editor](?) API reference for the complete list of methods and properties.

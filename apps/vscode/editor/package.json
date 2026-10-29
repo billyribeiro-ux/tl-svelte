@@ -1,0 +1,53 @@
+{
+	"name": "@svelte-draw/vscode-editor",
+	"description": "An an editor for the svelte-draw vscode extension.",
+	"version": "0.0.0",
+	"private": true,
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"sdk",
+		"drawing",
+		"app",
+		"development",
+		"whiteboard",
+		"canvas",
+		"infinite"
+	],
+	"devDependencies": {
+		"@svelte-draw/assets": "workspace:*",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@types/fs-extra": "^11.0.4",
+		"@types/node": "^22.15.31",
+		"concurrently": "^9.1.2",
+		"create-serve": "1.0.1",
+		"dotenv": "^16.4.7",
+		"fs-extra": "^11.3.0",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"svelte-draw": "workspace:*",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16"
+	},
+	"gitHead": "a7dac0f83ad998e205c2aab58182cb4ba4e099a6",
+	"type": "module",
+	"scripts": {
+		"build": "pnpm exec tsx scripts/build.ts",
+		"dev": "pnpm exec tsx scripts/dev.ts",
+		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+		"lint": "pnpm exec tsx ../../../internal/scripts/lint.ts",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+	}
+}

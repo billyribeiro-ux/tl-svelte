@@ -1,0 +1,94 @@
+{
+	"name": "svelte-draw",
+	"description": "A tiny little drawing editor.",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"svelteDraw_product": {
+		"stableId": "svelte-draw:sdk-core",
+		"name": "SDK",
+		"type": "product",
+		"premium": false
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"sdk",
+		"drawing",
+		"app",
+		"development",
+		"whiteboard",
+		"canvas",
+		"infinite"
+	],
+	"/* NOTE */": "These `main` and `types` fields are rewritten by the build script. They are not the actual values we publish",
+	"main": "./src/index.ts",
+	"types": "./.tsbuild/index.d.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./*.css": "./*.css"
+	},
+	"type": "module",
+	"scripts": {
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+	},
+	"files": [
+		"svelte-draw.css"
+	],
+	"dependencies": {
+		"@tiptap/core": "^3.12.1",
+		"@tiptap/extension-code": "^3.12.1",
+		"@tiptap/extension-highlight": "^3.12.1",
+		"@tiptap/extension-list": "^3.12.1",
+		"@tiptap/extension-typography": "3.13.0",
+		"@tiptap/pm": "^3.12.1",
+		"@tiptap/starter-kit": "^3.12.1",
+		"@svelte-draw/driver": "workspace:*",
+		"@svelte-draw/editor": "workspace:*",
+		"@svelte-draw/state": "workspace:*",
+		"@svelte-draw/store": "workspace:*",
+		"@svelte-draw/tlschema": "workspace:*",
+		"@internationalized/date": "3.12.4",
+		"bits-ui": "2.19.5",
+		"classnames": "^2.5.1",
+		"intl-messageformat": "12.1.3",
+		"idb": "^7.1.1",
+		"lz-string": "^1.5.0",
+		"@svelte-draw/svelte": "workspace:*"
+	},
+	"peerDependencies": {
+		"svelte": "^5.57.1"
+	},
+	"devDependencies": {
+		"@formatjs/cli": "^6.5.1",
+		"@peculiar/webcrypto": "^1.5.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@testing-library/dom": "^10.0.0",
+		"@testing-library/react": "^16.0.0",
+		"@testing-library/svelte": "^5.4.2",
+		"@types/classnames": "^2.3.4",
+		"@types/lz-string": "^1.5.0",
+		"fake-indexeddb": "^4.0.2",
+		"jest-diff": "^30.4.1",
+		"jsdom": "^29.1.1",
+		"resize-observer-polyfill": "^1.5.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vitest": "^5.0.0"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	}
+}

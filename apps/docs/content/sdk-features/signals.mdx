@@ -1,0 +1,359 @@
+---
+title: Signals
+created_at: 12/28/2025
+updated_at: 12/28/2025
+keywords:
+  - signals
+  - reactive
+  - state
+  - atoms
+  - computed
+  - reactor
+  - fromSignal
+status: published
+date: 12/28/2025
+readability: 9
+voice: 9
+completeness: 9
+accuracy: 10
+notes: ''
+---
+
+The svelte-draw SDK uses signals for state management. Signals automatically track dependencies: when state changes, only the parts of your application that depend on that state update.
+
+The editor exposes many of its internal values as signals. Methods like `editor.getSelectedShapeIds()` and `editor.getCurrentPageShapes()` return reactive values that update automatically when the underlying state changes. The Svelte bindings connect these signals to components, so you don't need to manage subscriptions yourself.
+
+The signals library lives in `@svelte-draw/state` and its Svelte bindings in `@svelte-draw/svelte`. Both are re-exported from `svelte-draw`, so `import { atom, fromComputed } from 'svelte-draw'` also works.
+
+## Core concepts
+
+### Atoms
+
+An atom holds a mutable value. When you change the value, any computeds or effects that depend on the atom will update.
+
+```ts
+import { atom } from '@svelte-draw/state'
+
+const count = atom('count', 0)
+
+count.get() // 0
+count.set(5)
+count.get() // 5
+
+// Update based on current value
+count.update((n) => n + 1)
+count.get() // 6
+```
+
+The first argument is a name for debugging. The second is the initial value. Atoms accept an options object with `isEqual` (a custom equality function), `historyLength` (the number of diffs to retain for incremental updates), and `computeDiff` (a function to compute diffs between values, only used when `historyLength` is set).
+
+### Computed values
+
+A computed derives its value from other signals. It recomputes only when its dependencies change.
+
+```ts
+import { atom, computed } from '@svelte-draw/state'
+
+const firstName = atom('firstName', 'Jane')
+const lastName = atom('lastName', 'Doe')
+
+const fullName = computed('fullName', () => {
+	return `${firstName.get()} ${lastName.get()}`
+})
+
+fullName.get() // 'Jane Doe'
+
+firstName.set('John')
+fullName.get() // 'John Doe' — recomputed automatically
+```
+
+Computed values are lazy: they don't calculate until you call `.get()`. They also cache their result. If you call `.get()` multiple times without any dependencies changing, the derivation function runs only once.
+
+The `@computed` decorator provides the same functionality for class methods:
+
+```ts
+import { atom, computed } from '@svelte-draw/state'
+
+class Counter {
+	count = atom('count', 0)
+
+	@computed getDoubled() {
+		return this.count.get() * 2
+	}
+}
+```
+
+### Effects and reactors
+
+Effects run side effects in response to signal changes. There are two ways to create them:
+
+```ts
+import { atom, react, reactor } from '@svelte-draw/state'
+
+const count = atom('count', 0)
+
+// react() starts immediately and returns a cleanup function
+const stop = react('log count', () => {
+	console.log('Count is:', count.get())
+})
+
+count.set(1) // logs: Count is: 1
+count.set(2) // logs: Count is: 2
+
+stop() // Stop listening
+
+// reactor() gives you control over when to start
+const r = reactor('log count', () => {
+	console.log('Count is:', count.get())
+})
+
+r.start() // Begin listening
+r.stop() // Stop listening
+```
+
+Effects track which signals they read and re-run when those signals change. The `scheduleEffect` option lets you batch updates, for example using `requestAnimationFrame`:
+
+```ts
+react(
+	'update-dom',
+	() => {
+		// DOM updates based on signal state
+	},
+	{
+		scheduleEffect: (execute) => requestAnimationFrame(execute),
+	}
+)
+```
+
+### Transactions
+
+Transactions batch multiple changes into a single update. Effects only run once after all changes complete:
+
+```ts
+import { atom, react, transact } from '@svelte-draw/state'
+
+const a = atom('a', 1)
+const b = atom('b', 2)
+
+react('sum', () => {
+	console.log('Sum:', a.get() + b.get())
+})
+
+// Without transaction: effect runs twice
+a.set(10) // logs: Sum: 12
+b.set(20) // logs: Sum: 30
+
+// With transaction: effect runs once
+transact(() => {
+	a.set(100)
+	b.set(200)
+})
+// logs: Sum: 300
+```
+
+The `transaction` function supports rollback:
+
+```ts
+import { transaction } from '@svelte-draw/state'
+
+transaction((rollback) => {
+	a.set(999)
+	if (somethingWentWrong) {
+		rollback() // Restores original values
+	}
+})
+```
+
+## Svelte integration
+
+Svelte doesn't track reads from signals on its own, so `@svelte-draw/svelte` provides bridges that turn signals into values Svelte can react to. They're exported from `@svelte-draw/svelte` and re-exported from `svelte-draw`.
+
+### fromSignal and fromComputed
+
+`fromSignal(signal)` returns an object with a `.current` getter. Reading `.current` inside a template, `$derived` or `$effect` subscribes that scope to the signal:
+
+```svelte
+<script lang="ts">
+	import { atom } from '@svelte-draw/state'
+	import { fromSignal } from 'svelte-draw'
+
+	const count = atom('count', 0)
+	const value = fromSignal(count)
+</script>
+
+<button onclick={() => count.update((n) => n + 1)}>Count: {value.current}</button>
+```
+
+`fromComputed(name, fn)` wraps a function that reads any number of signals. The result is memoized, so readers only re-run when the returned value changes:
+
+```svelte
+<script lang="ts">
+	import { fromComputed, getEditor } from 'svelte-draw'
+
+	const editor = getEditor()
+
+	const selectedCount = fromComputed('selected count', () => editor.getSelectedShapeIds().length)
+</script>
+
+<div>{selectedCount.current} shapes selected</div>
+```
+
+`getEditor()` returns the current editor and must be called during component initialization, inside a component rendered by `SvelteDraw` (for example in a component passed through the `components` prop).
+
+### quickReactor
+
+`quickReactor(name, fn)` runs `fn` immediately and again, synchronously, whenever a signal it reads changes. It returns a function that stops the reactor. Call it from `$effect` and return the result so the reactor is stopped on teardown:
+
+```svelte
+<script lang="ts">
+	import { getEditor, quickReactor } from 'svelte-draw'
+
+	const editor = getEditor()
+
+	$effect(() =>
+		quickReactor('update title', () => {
+			document.title = `${editor.getSelectedShapeIds().length} shapes selected`
+		})
+	)
+</script>
+```
+
+For an effect that is throttled to animation frames, call `react` with the `scheduleEffect` option from `$effect` and return its cleanup function:
+
+```ts
+import { react } from '@svelte-draw/state'
+
+$effect(() =>
+	react(
+		'update title',
+		() => {
+			document.title = `${editor.getSelectedShapeIds().length} shapes selected`
+		},
+		{ scheduleEffect: (execute) => requestAnimationFrame(execute) }
+	)
+)
+```
+
+### Component-local signals
+
+Svelte has its own state primitives. For state that only your component uses, use `$state` and `$derived`. Create an `atom` or `computed` when other code outside Svelte, such as a tool or a shape util, also needs to read the value, and bridge it with `fromSignal`.
+
+## Signals in the editor
+
+The editor uses signals extensively. Most getter methods return reactive values:
+
+```svelte
+<script lang="ts">
+	import { fromComputed, getEditor } from 'svelte-draw'
+
+	const editor = getEditor()
+
+	const selectedShapes = fromComputed('shapes', () => editor.getSelectedShapes())
+	const currentPage = fromComputed('page', () => editor.getCurrentPage())
+	const zoomLevel = fromComputed('zoom', () => editor.getZoomLevel())
+</script>
+
+<div>
+	<div>Page: {currentPage.current.name}</div>
+	<div>Zoom: {Math.round(zoomLevel.current * 100)}%</div>
+	<div>{selectedShapes.current.length} shapes selected</div>
+</div>
+```
+
+## Debugging
+
+The `whyAmIRunning` function helps trace what triggered an update. Call it inside an effect or computed to see which signals changed:
+
+```ts
+import { atom, react, whyAmIRunning } from '@svelte-draw/state'
+
+const name = atom('name', 'Bob')
+
+react('greeting', () => {
+	whyAmIRunning()
+	console.log('Hello', name.get())
+})
+
+name.set('Alice')
+// Console output:
+// Effect(greeting) is executing because:
+//  ↳ Atom(name) changed
+```
+
+For nested dependencies, the output shows the full chain:
+
+```ts
+const firstName = atom('firstName', 'Jane')
+const lastName = atom('lastName', 'Doe')
+const fullName = computed('fullName', () => `${firstName.get()} ${lastName.get()}`)
+
+react('log name', () => {
+	whyAmIRunning()
+	console.log(fullName.get())
+})
+
+firstName.set('John')
+// Console output:
+// Effect(log name) is executing because:
+//  ↳ Computed(fullName) changed
+//    ↳ Atom(firstName) changed
+```
+
+All signals have a `name` property (the first argument when creating them) that appears in debug output.
+
+## Reading without tracking
+
+Sometimes you want to read a signal's value without creating a dependency. Use `unsafe__withoutCapture` to read signals without triggering re-runs:
+
+```ts
+import { atom, react, unsafe__withoutCapture } from '@svelte-draw/state'
+
+const name = atom('name', 'Sam')
+const time = atom('time', Date.now())
+
+// Update time every second
+setInterval(() => time.set(Date.now()), 1000)
+
+react('log name changes', () => {
+	// Only re-run when name changes, not when time changes
+	const currentTime = unsafe__withoutCapture(() => time.get())
+	console.log(name.get(), 'was changed at', currentTime)
+})
+```
+
+## API reference
+
+### @svelte-draw/state
+
+| Export                               | Description                                                    |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `atom(name, value, options)`         | Create a mutable signal                                        |
+| `computed(name, fn, options)`        | Create a derived signal                                        |
+| `@computed`                          | Decorator for computed class methods                           |
+| `react(name, fn, options)`           | Run an effect immediately, returns cleanup function            |
+| `reactor(name, fn, options)`         | Create a controllable effect with `start()` and `stop()`       |
+| `transact(fn)`                       | Batch changes into a single update                             |
+| `transaction(fn)`                    | Batch changes with rollback support                            |
+| `isAtom(value)`                      | Type guard for atoms                                           |
+| `isSignal(value)`                    | Type guard for any signal                                      |
+| `getComputedInstance(o, p)`          | Get the underlying computed for a `@computed` decorated method |
+| `whyAmIRunning()`                    | Debug helper to trace update triggers                          |
+| `unsafe__withoutCapture(fn)`         | Read signals without creating dependencies                     |
+| `RESET_VALUE`                        | Symbol returned by `getDiffSince` when history is insufficient |
+| `isUninitialized(value)`             | Check if a computed is running its first derivation            |
+| `withDiff(value, diff)`              | Manually provide a diff when returning from a computed         |
+| `localStorageAtom(name, v, options)` | Returns `[atom, cleanup]` tuple; atom persists to localStorage |
+
+### @svelte-draw/svelte
+
+| Export                      | Description                                                                              |
+| --------------------------- | ---------------------------------------------------------------------------------------- |
+| `fromSignal(signal)`        | Bridge a signal to a `{ current }` object that Svelte tracks                             |
+| `fromComputed(name, fn)`    | Derive a memoized `{ current }` value from a function that reads signals                 |
+| `quickReactor(name, fn)`    | Run an effect immediately and on every change; returns a stop function for `$effect`     |
+| `getEditor()`               | Read the current editor from context during component initialization                    |
+
+## Related examples
+
+- [Signals](/examples/events/signals) - Subscribing to editor values and running side effects with `fromComputed` and `quickReactor`.
+- [Reactive inputs](/examples/editor-api/reactive-inputs) - Using `fromComputed` with editor input state.

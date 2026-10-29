@@ -1,0 +1,46 @@
+import { ROOM_SIZE_LIMIT_MB } from '@svelte-draw/dotcom-shared'
+import type { Editor } from 'svelte-draw'
+import { trackEvent } from '../utils/analytics'
+
+function getFileSizeBucket(sizeMB: number): string {
+	if (sizeMB <= 1) return '0-1 MB'
+	if (sizeMB <= 5) return '1-5 MB'
+	if (sizeMB <= 10) return '5-10 MB'
+	return '10+ MB'
+}
+
+export function estimateFileSizeBucket(editor: Editor): string {
+	let estimatedFileSizeMB = 0
+	try {
+		const meta = editor.getDocumentSettings().meta
+		const storagePercentage =
+			typeof meta.storageUsedPercentage === 'number' ? meta.storageUsedPercentage : 0
+		// Calculate estimated file size based on storage percentage
+		estimatedFileSizeMB = (storagePercentage / 100) * ROOM_SIZE_LIMIT_MB
+	} catch (error) {
+		console.warn('Failed to get storage percentage for analytics:', error)
+	}
+	return getFileSizeBucket(estimatedFileSizeMB)
+}
+
+/** What the client had to mount and render, so load times can be bucketed by board size. */
+export function boardSizeFields(editor: Editor) {
+	return {
+		page_shapes: editor.getCurrentPageShapeIds().size,
+		records: editor.store.allRecords().length,
+	}
+}
+
+export function getRoomLoadTracking() {
+	const loadStartTime = Date.now()
+
+	return (editor: Editor) => {
+		const loadTime = Date.now() - loadStartTime
+
+		// Send analytics data to PostHog
+		trackEvent('room_load_duration', {
+			load_time_ms: loadTime,
+			file_size_bucket: estimateFileSizeBucket(editor),
+		})
+	}
+}

@@ -1,0 +1,22 @@
+import { structuredClone } from 'svelte-draw'
+import { convertSvelteDrawIdToSimpleId } from '../../shared/format/convertSvelteDrawShapeToFocusedShape'
+import type { SelectedShapesPart } from '../../shared/schema/PromptPartDefinitions'
+import type { AgentRequest } from '../../shared/types/AgentRequest'
+import { PromptPartUtil, registerPromptPartUtil } from './PromptPartUtil'
+
+export const SelectedShapesPartUtil = registerPromptPartUtil(
+	class SelectedShapesPartUtil extends PromptPartUtil<SelectedShapesPart> {
+		static override type = 'selectedShapes' as const
+
+		override getPart(_request: AgentRequest): SelectedShapesPart {
+			const { editor } = this
+
+			const userSelectedShapes = editor.getSelectedShapes().map((v) => structuredClone(v)) ?? []
+
+			return {
+				type: 'selectedShapes',
+				shapeIds: userSelectedShapes.map((shape) => convertSvelteDrawIdToSimpleId(shape.id)),
+			}
+		}
+	}
+)

@@ -1,0 +1,154 @@
+---
+title: Quick start
+status: published
+author: steveruizok
+date: 3/22/2023
+order: 0
+keywords:
+  - hello world
+  - intro
+  - start
+  - installation
+---
+
+Have five minutes? Run this command in your terminal to explore svelte-draw [starter kits](/starter-kits):
+
+```bash
+npm create svelte-draw@latest
+```
+
+Have a little more time? Let's try out the svelte-draw SDK in a Svelte project.
+
+If you're new to Svelte, we recommend starting with [SvelteKit](https://svelte.dev/docs/kit/creating-a-project) (or the `sveltekit` template in this repository). We'll assume your project is already running locally.
+
+## Getting started
+
+First, install the `svelte-draw` package from npm:
+
+```bash
+npm install svelte-draw
+```
+
+Next, in your Svelte 5 project, import the `SvelteDraw` component and svelte-draw's CSS styles. Then render the `SvelteDraw` component inside a full screen container:
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw />
+</div>
+```
+
+That's pretty much it! At this point, you should have a complete working single-user canvas. You can draw, write, add images and video, zoom, pan, copy and paste, undo and redo—everything you'd expect from a canvas.
+
+You'll be starting from our default [shapes](/docs/shapes), [tools](/docs/tools), and [user interface](/docs/user-interface), but you can customize all of these things for your project if you wish. For now, let's show off a few more features.
+
+## Local persistence
+
+Let's add local persistence by passing a `persistenceKey` prop to the `SvelteDraw` component:
+
+<FocusLines lines={[7]}>
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw persistenceKey="example" />
+</div>
+```
+
+</FocusLines>
+
+The `persistenceKey` prop saves your project to the browser's storage so that it survives a refresh. It also synchronizes the project with other instances that share the same key—even in other browser tabs! Give it a try by opening your app in a second window.
+
+## Real-time collaboration
+
+To add support for multiple users collaborating in real time, you can use the [**svelte-draw sync**](/docs/sync) library. Its demo helper connects your app to svelte-draw's demo server, which hosts temporary rooms.
+
+First, install the `@svelte-draw/sync` package:
+
+```bash
+npm install @svelte-draw/sync
+```
+
+Next, import the `createSyncDemo` function from the `@svelte-draw/sync` package. Call it while your component initializes, passing a getter that returns an options object with a unique room ID, and pass its `current` store to the `SvelteDraw` component:
+
+<FocusLines lines={[3,6,10]}>
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+	import { createSyncDemo } from '@svelte-draw/sync'
+	import 'svelte-draw/svelte-draw.css'
+
+	const sync = createSyncDemo(() => ({ roomId: 'insert-any-string-here' }))
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw store={sync.current} />
+</div>
+```
+
+</FocusLines>
+
+Try it out by opening your project in a second incognito window, or else access it from another device. You should see all of svelte-draw's multiplayer features: live cursors, user names, viewport following, cursor chat, and more.
+
+If you want to go further with real-time collaboration, be sure to check out our guide to the [**svelte-draw sync**](/docs/sync) library.
+
+## Controlling the canvas
+
+The svelte-draw [editor](/docs/editor) has a runtime JavaScript API. Everything that can happen in svelte-draw can be done programmatically through the [Editor](?) instance.
+
+For simplicity's sake, let's roll back our persistence and sync code. We can then use the `SvelteDraw` component's `onMount` callback to get access to the Editor instance. We'll use the editor to create a new shape on the canvas, select it, then slowly zoom to it.
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw, toRichText, type Editor } from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+
+	function handleMount(editor: Editor) {
+		editor.createShape({
+			type: 'text',
+			x: 200,
+			y: 200,
+			props: {
+				richText: toRichText('Hello world!'),
+			},
+		})
+
+		editor.selectAll()
+
+		editor.zoomToSelection({
+			animation: { duration: 5000 },
+		})
+	}
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw onMount={handleMount} />
+</div>
+```
+
+The Editor is svelte-draw's main interface for controlling the canvas. Be sure to check out the [Editor](?) API documentation for more information on what you can do with it, as well as our [guide on using the editor](/docs/editor).
+
+## Next steps
+
+Now that you've seen how the svelte-draw canvas works, you can:
+
+- Create your own [shapes](/docs/shapes) and [tools](/docs/tools)
+- Customize the [user interface](/docs/user-interface)
+- Learn more about the [editor](/docs/editor)
+- Explore our [examples](/examples)
+- Build with our [starter kits](/starter-kits)
+
+The SDK lets you customize shapes, tools, UI, and more. In addition to our long-form docs, we have dozens of examples in our [examples section](/examples) that cover more of its functionality. You can run these locally with the svelte-draw GitHub repository.
+
+## Join our community
+
+If you build something great, please share it with us in our #show-and-tell channel on Discord. Good luck!

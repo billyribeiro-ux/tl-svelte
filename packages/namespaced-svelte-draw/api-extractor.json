@@ -1,0 +1,20 @@
+{
+	"$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+	"extends": "../../internal/config/api-extractor.json",
+	// the file paths in the shared api-extractor.json don't work for us here, so we specify them manually:
+	"mainEntryPointFilePath": "<projectFolder>/packages/namespaced-svelte-draw/.tsbuild-api/index.d.ts",
+	"compiler": {
+		"tsconfigFilePath": "<projectFolder>/packages/namespaced-svelte-draw/tsconfig.json"
+	},
+	"apiReport": {
+		"reportFolder": "<projectFolder>/packages/namespaced-svelte-draw/",
+		"reportTempFolder": "<projectFolder>/packages/namespaced-svelte-draw/api/temp"
+	},
+	"docModel": {
+		"apiJsonFilePath": "<projectFolder>/packages/namespaced-svelte-draw/api/api.json"
+	},
+	"dtsRollup": {
+		"untrimmedFilePath": "<projectFolder>/packages/namespaced-svelte-draw/api/internal.d.ts",
+		"publicTrimmedFilePath": "<projectFolder>/packages/namespaced-svelte-draw/api/public.d.ts"
+	}
+}

@@ -1,0 +1,52 @@
+{
+	"name": "@svelte-draw/simple-server-example",
+	"description": "svelte-draw infinite canvas SDK (example node server).",
+	"version": "0.0.0",
+	"private": true,
+	"author": "billyribeiro-ux",
+	"license": "MIT",
+	"main": "./src/server/server.ts",
+	"scripts": {
+		"dev": "concurrently -n server,client -c red,blue \"npm run dev-server\" \"npm run dev-client\"",
+		"dev-server": "pnpm exec tsx watch ./src/server/server.ts",
+		"dev-client": "vite dev --host",
+		"test-ci": "echo 'No tests yet'",
+		"test": "pnpm exec vitest run --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-kit sync && ! svelte-check --tsconfig ./tsconfig.json --threshold error --output machine | grep ' ERROR ' | grep -v '\"../../packages' && ! tsc -p tsconfig.server.json | grep '^src/'",
+		"build": "vite build"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-static": "4.0.0",
+		"@sveltejs/kit": "3.1.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@types/better-sqlite3": "^7.6.12",
+		"@types/express": "^4.17.21",
+		"@types/ws": "^8.18.1",
+		"concurrently": "^9.1.2",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"tsx": "^4.19.2",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16"
+	},
+	"dependencies": {
+		"@fastify/cors": "^10.0.0",
+		"@fastify/websocket": "^11.0.0",
+		"@svelte-draw/assets": "workspace:*",
+		"@svelte-draw/sync": "workspace:*",
+		"@svelte-draw/sync-core": "workspace:*",
+		"better-sqlite3": "^12.10.0",
+		"fastify": "^5.8.1",
+		"itty-router": "^5.0.18",
+		"svelte-draw": "workspace:*",
+		"unfurl.js": "^6.4.0",
+		"ws": "^8.18.0"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.ts",
+		"#lib/*": "./src/lib/*"
+	},
+	"type": "module"
+}

@@ -1,0 +1,35 @@
+{
+	"name": "@svelte-draw/bemo-worker",
+	"description": "svelte-draw infinite canvas SDK (merge server).",
+	"version": "0.0.0",
+	"private": true,
+	"author": "billyribeiro-ux",
+	"main": "./src/worker.ts",
+	"/* GOTCHA */": "files will include ./dist and index.d.ts by default, add any others you want to include in here",
+	"files": [],
+	"scripts": {
+		"dev": "pnpm exec tsx ../../internal/scripts/workers/dev.ts",
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"check-bundle-size": "pnpm exec tsx ../../internal/scripts/check-worker-bundle.ts --entry src/worker.ts --size-limit-bytes 350000",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "tsc --build"
+	},
+	"dependencies": {
+		"@svelte-draw/dotcom-shared": "workspace:*",
+		"@svelte-draw/store": "workspace:*",
+		"@svelte-draw/sync-core": "workspace:*",
+		"@svelte-draw/tlschema": "workspace:*",
+		"@svelte-draw/utils": "workspace:*",
+		"@svelte-draw/validate": "workspace:*",
+		"@svelte-draw/worker-shared": "workspace:*",
+		"itty-router": "^5.0.18"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20260302.0",
+		"esbuild": "^0.28.0",
+		"typescript": "^7.0.2",
+		"wrangler": "^4.75.0"
+	}
+}

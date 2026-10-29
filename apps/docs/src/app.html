@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" class="font-sans antialiased">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+		<meta name="theme-color" content="#ffffff" />
+		<meta name="application-name" content="svelte-draw SDK" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-title" content="svelte-draw SDK" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="twitter:creator" content="@svelte-draw" />
+		<script>
+			// Applies the stored theme before first paint (the job next-themes' injected script did).
+			// Keep in sync with `src/lib/theme.svelte.ts`.
+			;(function () {
+				var theme = 'light'
+				try {
+					var stored = localStorage.getItem('theme')
+					if (stored === 'light' || stored === 'dark') theme = stored
+				} catch (e) {}
+				var root = document.documentElement
+				root.classList.remove('light', 'dark')
+				root.classList.add(theme)
+				root.style.colorScheme = theme
+			})()
+		</script>
+		%sveltekit.head%
+	</head>
+	<body
+		data-sveltekit-preload-data="hover"
+		class="overflow-x-hidden bg-white text-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+	>
+		<div style="display: contents">%sveltekit.body%</div>
+		<noscript>
+			<iframe
+				src="https://www.googletagmanager.com/ns.html?id=GTM-KMMLPMMN"
+				height="0"
+				width="0"
+				style="display: none; visibility: hidden"
+				title="Google Tag Manager"
+			></iframe>
+		</noscript>
+	</body>
+</html>

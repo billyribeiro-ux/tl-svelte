@@ -1,0 +1,53 @@
+{
+	"name": "svelte-draw-workflow",
+	"private": true,
+	"version": "0.0.0",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "MIT",
+	"type": "module",
+	"svelteDraw_template": {
+		"repo": "billyribeiro-ux/tl-svelte",
+		"cli": {
+			"name": "Workflow",
+			"description": "Create a node-based builder for visual workflows.",
+			"shortDescription": "Visual node-based builder for workflows.",
+			"order": 4
+		},
+		"scripts": {
+			"lint": null,
+			"build-types": null
+		},
+		"path": "templates/workflow"
+	},
+	"scripts": {
+		"dev": "vite dev --host",
+		"build": "vite build",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"preview": "vite preview",
+		"test": "vitest",
+		"test-ci": "vitest run --passWithNoTests",
+		"build-types": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --threshold error"
+	},
+	"dependencies": {
+		"@svelte-draw/assets": "workspace:*",
+		"bits-ui": "2.19.5",
+		"classnames": "^2.5.1",
+		"svelte-draw": "workspace:*"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-static": "4.0.0",
+		"@sveltejs/kit": "3.1.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"jsdom": "^29.1.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16",
+		"vitest": "^5.0.0"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.ts",
+		"#lib/*": "./src/lib/*"
+	}
+}

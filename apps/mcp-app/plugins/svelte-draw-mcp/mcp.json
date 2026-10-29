@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"svelte-draw": {
+			"transport": "http",
+			"url": "https://svelte-draw-mcp-app.svelte-draw.invalid/mcp"
+		}
+	}
+}

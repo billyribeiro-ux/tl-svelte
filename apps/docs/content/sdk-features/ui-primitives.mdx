@@ -1,0 +1,476 @@
+---
+title: UI primitives
+created_at: 12/25/2025
+updated_at: 12/25/2025
+keywords:
+  - ui
+  - primitives
+  - button
+  - icon
+  - menu
+  - dialog
+  - components
+status: published
+date: 12/25/2025
+readability: 9
+voice: 8
+completeness: 8
+accuracy: 10
+notes: ''
+---
+
+The `svelte-draw` package exports a set of UI primitive components that you can use when building custom interfaces. These components match the look and feel of svelte-draw's default UI and integrate with the editor's theming, translations, and accessibility features.
+
+Use these primitives when you want your custom UI to feel like a natural part of svelte-draw rather than something bolted on. See the [UI primitives example](/examples/ui/ui-primitives) for all of them in one place.
+
+## Buttons
+
+The button system consists of [SvelteDrawUiButton](?) and its companion components for icons, labels, and check indicators. Button content is passed as children, and click handlers use Svelte's `onclick` attribute.
+
+### SvelteDrawUiButton
+
+The base button component with several visual variants:
+
+```svelte
+<script lang="ts">
+	import { SvelteDrawUiButton, SvelteDrawUiButtonIcon, SvelteDrawUiButtonLabel } from 'svelte-draw'
+</script>
+
+<SvelteDrawUiButton type="normal" onclick={() => console.log('clicked')}>
+	<SvelteDrawUiButtonLabel>Normal</SvelteDrawUiButtonLabel>
+</SvelteDrawUiButton>
+
+<SvelteDrawUiButton type="primary" onclick={() => console.log('clicked')}>
+	<SvelteDrawUiButtonLabel>Primary</SvelteDrawUiButtonLabel>
+</SvelteDrawUiButton>
+
+<SvelteDrawUiButton type="danger" onclick={() => console.log('clicked')}>
+	<SvelteDrawUiButtonLabel>Danger</SvelteDrawUiButtonLabel>
+</SvelteDrawUiButton>
+
+<SvelteDrawUiButton type="icon" onclick={() => console.log('clicked')}>
+	<SvelteDrawUiButtonIcon icon="plus" />
+</SvelteDrawUiButton>
+```
+
+The `type` prop controls the button's appearance:
+
+| Type      | Description                              |
+| --------- | ---------------------------------------- |
+| `normal`  | Standard button for general actions      |
+| `primary` | Emphasized button for primary actions    |
+| `danger`  | Red button for destructive actions       |
+| `low`     | Subtle button with minimal visual weight |
+| `icon`    | Square button sized for a single icon    |
+| `tool`    | Tool button style used in the toolbar    |
+| `menu`    | Button style used inside menus           |
+| `help`    | Style used for help/info buttons         |
+
+Use `isActive` to indicate a selected or active state, and `tooltip` to show a tooltip on hover:
+
+```svelte
+<SvelteDrawUiButton type="tool" isActive={true} tooltip="Draw">
+	<SvelteDrawUiButtonIcon icon="tool-pencil" />
+</SvelteDrawUiButton>
+```
+
+### Button sub-components
+
+Build up button contents using these components:
+
+```svelte
+<script lang="ts">
+	import {
+		SvelteDrawUiButton,
+		SvelteDrawUiButtonCheck,
+		SvelteDrawUiButtonIcon,
+		SvelteDrawUiButtonLabel,
+	} from 'svelte-draw'
+</script>
+
+<!-- Icon button -->
+<SvelteDrawUiButton type="icon">
+	<SvelteDrawUiButtonIcon icon="trash" />
+</SvelteDrawUiButton>
+
+<!-- Button with icon and label -->
+<SvelteDrawUiButton type="menu">
+	<SvelteDrawUiButtonIcon icon="plus" />
+	<SvelteDrawUiButtonLabel>Add item</SvelteDrawUiButtonLabel>
+</SvelteDrawUiButton>
+
+<!-- Button with checkmark (for toggles in menus) -->
+<SvelteDrawUiButton type="menu">
+	<SvelteDrawUiButtonCheck checked={true} />
+	<SvelteDrawUiButtonLabel>Show grid</SvelteDrawUiButtonLabel>
+</SvelteDrawUiButton>
+```
+
+## Icons
+
+[SvelteDrawUiIcon](?) renders icons from svelte-draw's icon set. Icons are SVG masks filled with the current text color.
+
+```svelte
+<script lang="ts">
+	import { SvelteDrawUiIcon } from 'svelte-draw'
+</script>
+
+<SvelteDrawUiIcon icon="tool-pencil" label="Draw tool" />
+<SvelteDrawUiIcon icon="arrow-left" label="Go back" small />
+<SvelteDrawUiIcon icon="check" label="Complete" color="green" />
+```
+
+The `label` prop is required for accessibility—it becomes the icon's `aria-label`. Use `small` for a smaller icon size.
+
+You can also pass a custom icon instead of an icon name. The `icon` prop then takes a snippet (typed as `TLUiIconJsx`) that receives `props` (class, `aria-label`, style) and should spread them onto its root element:
+
+```svelte
+{#snippet star({ props })}
+	<div {...props} class="my-custom-icon">★</div>
+{/snippet}
+
+<SvelteDrawUiIcon icon={star} label="Favorite" />
+```
+
+## Menu primitives
+
+When adding items to svelte-draw's menus, use these components to match the default menu styling and behavior. Menu primitives read a menu context to decide how to render, so they must be placed inside one of svelte-draw's menus (for example a custom `MainMenu` or `ContextMenu` component) or wrapped in a [SvelteDrawUiMenuContextProvider](?). See the [custom menus example](/examples/ui/custom-menus).
+
+### SvelteDrawUiMenuItem
+
+[SvelteDrawUiMenuItem](?) is the main component for menu items. It adapts its rendering to the menu it's in (dropdown, context menu, toolbar, and so on):
+
+```svelte
+<script lang="ts">
+	import { SvelteDrawUiMenuGroup, SvelteDrawUiMenuItem } from 'svelte-draw'
+</script>
+
+<SvelteDrawUiMenuGroup id="my-actions">
+	<SvelteDrawUiMenuItem
+		id="my-action"
+		label="Do something"
+		iconLeft="plus"
+		kbd="cmd+shift+d"
+		onSelect={() => {
+			console.log('action triggered')
+		}}
+	/>
+</SvelteDrawUiMenuGroup>
+```
+
+The props are:
+
+| Prop         | Description                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| `id`         | Unique identifier for the menu item                                             |
+| `label`      | Display text (supports translation keys)                                        |
+| `icon`       | Icon for icon-style menus and toolbars (not shown in dropdown or context menus) |
+| `iconLeft`   | Icon shown on the left in dropdown and context menus                            |
+| `kbd`        | Keyboard shortcut to display                                                    |
+| `onSelect`   | Called when the item is clicked                                                 |
+| `disabled`   | Whether the item is disabled                                                    |
+| `readonlyOk` | If true, item is shown even in readonly mode                                    |
+| `isSelected` | Whether the item shows as selected (for toolbar items)                          |
+| `spinner`    | Show a loading spinner                                                          |
+| `noClose`    | Prevent the menu from closing when clicked                                      |
+
+### SvelteDrawUiMenuGroup
+
+[SvelteDrawUiMenuGroup](?) groups related menu items together. In dropdown menus, groups are separated by dividers:
+
+```svelte
+<SvelteDrawUiMenuGroup id="clipboard">
+	<SvelteDrawUiMenuItem id="cut" label="Cut" kbd="cmd+x" onSelect={handleCut} />
+	<SvelteDrawUiMenuItem id="copy" label="Copy" kbd="cmd+c" onSelect={handleCopy} />
+	<SvelteDrawUiMenuItem id="paste" label="Paste" kbd="cmd+v" onSelect={handlePaste} />
+</SvelteDrawUiMenuGroup>
+```
+
+### SvelteDrawUiMenuSubmenu
+
+[SvelteDrawUiMenuSubmenu](?) creates a nested submenu:
+
+```svelte
+<SvelteDrawUiMenuSubmenu id="export" label="Export as...">
+	<SvelteDrawUiMenuGroup id="formats">
+		<SvelteDrawUiMenuItem id="png" label="PNG" onSelect={exportPng} />
+		<SvelteDrawUiMenuItem id="svg" label="SVG" onSelect={exportSvg} />
+		<SvelteDrawUiMenuItem id="json" label="JSON" onSelect={exportJson} />
+	</SvelteDrawUiMenuGroup>
+</SvelteDrawUiMenuSubmenu>
+```
+
+### SvelteDrawUiMenuCheckboxItem
+
+[SvelteDrawUiMenuCheckboxItem](?) is a menu item with a checkbox:
+
+```svelte
+<script lang="ts">
+	import { SvelteDrawUiMenuCheckboxItem } from 'svelte-draw'
+
+	let snapEnabled = $state(false)
+</script>
+
+<SvelteDrawUiMenuCheckboxItem
+	id="snap-to-grid"
+	label="Snap to grid"
+	checked={snapEnabled}
+	onSelect={() => {
+		snapEnabled = !snapEnabled
+	}}
+/>
+```
+
+The `onSelect` callback receives a `source` parameter, a [TLUiEventSource](?) such as `'main-menu'` or `'context-menu'`, taken from the surrounding menu context. Ignore it if you don't need to tell sources apart.
+
+To put an existing action or tool in a menu, use [SvelteDrawUiMenuActionItem](?) (with `actionId`) or [SvelteDrawUiMenuToolItem](?) (with `toolId`); they fill in the label, icon, and shortcut for you.
+
+## Dialogs
+
+Build modal dialogs using svelte-draw's dialog primitives ([SvelteDrawUiDialogHeader](?), [SvelteDrawUiDialogTitle](?), [SvelteDrawUiDialogCloseButton](?), [SvelteDrawUiDialogBody](?), and [SvelteDrawUiDialogFooter](?)) and open them with `getDialogs`. These components handle accessibility, focus management, and styling.
+
+`MyDialog.svelte`:
+
+```svelte
+<script lang="ts">
+	import {
+		SvelteDrawUiButton,
+		SvelteDrawUiButtonLabel,
+		SvelteDrawUiDialogBody,
+		SvelteDrawUiDialogCloseButton,
+		SvelteDrawUiDialogFooter,
+		SvelteDrawUiDialogHeader,
+		SvelteDrawUiDialogTitle,
+		type TLUiDialogProps,
+	} from 'svelte-draw'
+
+	let { onClose }: TLUiDialogProps = $props()
+</script>
+
+<SvelteDrawUiDialogHeader>
+	<SvelteDrawUiDialogTitle>Confirm deletion</SvelteDrawUiDialogTitle>
+	<SvelteDrawUiDialogCloseButton />
+</SvelteDrawUiDialogHeader>
+<SvelteDrawUiDialogBody style="max-width: 350px;">
+	Are you sure you want to delete this item? This action cannot be undone.
+</SvelteDrawUiDialogBody>
+<SvelteDrawUiDialogFooter class="tlui-dialog__footer__actions">
+	<SvelteDrawUiButton type="normal" onclick={onClose}>
+		<SvelteDrawUiButtonLabel>Cancel</SvelteDrawUiButtonLabel>
+	</SvelteDrawUiButton>
+	<SvelteDrawUiButton
+		type="danger"
+		onclick={() => {
+			deleteItem()
+			onClose()
+		}}
+	>
+		<SvelteDrawUiButtonLabel>Delete</SvelteDrawUiButtonLabel>
+	</SvelteDrawUiButton>
+</SvelteDrawUiDialogFooter>
+```
+
+Show the dialog with `getDialogs`, from a component rendered inside `SvelteDraw` (for example in a `components` slot):
+
+```svelte
+<script lang="ts">
+	import { getDialogs } from 'svelte-draw'
+	import MyDialog from './MyDialog.svelte'
+
+	const { addDialog } = getDialogs()
+</script>
+
+<button onclick={() => addDialog({ component: MyDialog })}>Delete item</button>
+```
+
+The `onClose` function is passed to your dialog component automatically. Call it to dismiss the dialog. See the [toasts and dialogs example](/examples/ui/toasts-and-dialogs) for the full version.
+
+## Input
+
+[SvelteDrawUiInput](?) is a styled text input with built-in handling for Enter (confirm) and Escape (cancel):
+
+```svelte
+<SvelteDrawUiInput
+	label="Name"
+	defaultValue="Untitled"
+	onComplete={(value) => {
+		// Called when user presses Enter
+		saveName(value)
+	}}
+	onCancel={(value) => {
+		// Called when user presses Escape
+		// Value is reset to initial value
+	}}
+	onValueChange={(value) => {
+		// Called on every keystroke
+	}}
+	autoSelect
+	autoFocus
+/>
+```
+
+Add icons to the input using `iconLeft` (left side) or `icon` (right side):
+
+```svelte
+<SvelteDrawUiInput
+	iconLeft="zoom-in"
+	placeholder="Search shapes..."
+	onValueChange={(value) => (searchQuery = value)}
+/>
+<SvelteDrawUiInput icon="check" placeholder="Confirmed value" />
+```
+
+## Layout
+
+[SvelteDrawUiRow](?), [SvelteDrawUiColumn](?), and [SvelteDrawUiGrid](?) organize UI controls with proper spacing and orientation-aware tooltips.
+
+```svelte
+<script lang="ts">
+	import {
+		SvelteDrawUiButton,
+		SvelteDrawUiButtonIcon,
+		SvelteDrawUiButtonLabel,
+		SvelteDrawUiColumn,
+		SvelteDrawUiGrid,
+		SvelteDrawUiRow,
+	} from 'svelte-draw'
+
+	const colors = ['red', 'green', 'blue', 'orange']
+	let color = $state('red')
+</script>
+
+<!-- Horizontal row of buttons -->
+<SvelteDrawUiRow>
+	<SvelteDrawUiButton type="icon"><SvelteDrawUiButtonIcon icon="align-left" /></SvelteDrawUiButton>
+	<SvelteDrawUiButton type="icon">
+		<SvelteDrawUiButtonIcon icon="align-center-horizontal" />
+	</SvelteDrawUiButton>
+	<SvelteDrawUiButton type="icon"><SvelteDrawUiButtonIcon icon="align-right" /></SvelteDrawUiButton>
+</SvelteDrawUiRow>
+
+<!-- Vertical column -->
+<SvelteDrawUiColumn>
+	<SvelteDrawUiButton type="menu"><SvelteDrawUiButtonLabel>Option 1</SvelteDrawUiButtonLabel></SvelteDrawUiButton>
+	<SvelteDrawUiButton type="menu"><SvelteDrawUiButtonLabel>Option 2</SvelteDrawUiButtonLabel></SvelteDrawUiButton>
+</SvelteDrawUiColumn>
+
+<!-- 4-column grid (useful for color pickers, shape selectors, etc.) -->
+<SvelteDrawUiGrid>
+	{#each colors as c (c)}
+		<SvelteDrawUiButton type="icon" onclick={() => (color = c)}>
+			<div style="background: {c}; width: 16px; height: 16px"></div>
+		</SvelteDrawUiButton>
+	{/each}
+</SvelteDrawUiGrid>
+```
+
+These components set up an orientation context. By default, tooltips appear below items in rows and to the right of items in columns; nested layouts inherit the side until the orientation changes. Pass `tooltipSide` to override it.
+
+## Other primitives
+
+### SvelteDrawUiKbd
+
+[SvelteDrawUiKbd](?) displays a keyboard shortcut using platform-specific symbols. The shortcut string is passed as the `keys` prop. It is hidden on small mobile breakpoints unless you pass `visibleOnMobileLayout`:
+
+```svelte
+<SvelteDrawUiKbd keys="cmd+shift+d" />
+```
+
+### SvelteDrawUiSlider
+
+[SvelteDrawUiSlider](?) is a slider control with discrete integer steps rather than a continuous range:
+
+```svelte
+<SvelteDrawUiSlider
+	title="Opacity"
+	label="style-panel.opacity"
+	value={5}
+	steps={10}
+	onValueChange={(value) => console.log(value)}
+/>
+```
+
+The props are:
+
+| Prop            | Description                                                          |
+| --------------- | -------------------------------------------------------------------- |
+| `title`         | Title text, combined with the label for the tooltip and `aria-label` |
+| `label`         | Translation key for the label                                        |
+| `value`         | Current value (`min` to `steps`), or `null`                          |
+| `steps`         | Maximum value                                                        |
+| `min`           | Optional minimum value (defaults to 0)                               |
+| `onValueChange` | Called with the new value when it changes                            |
+| `onHistoryMark` | Called on pointer down so you can mark a history stopping point      |
+
+### SvelteDrawUiPopover
+
+[SvelteDrawUiPopover](?) shows content next to a trigger element. The trigger takes a `child` snippet that receives `props` to spread onto the element that opens the popover:
+
+```svelte
+<SvelteDrawUiPopover id="my-popover">
+	<SvelteDrawUiPopoverTrigger>
+		{#snippet child({ props })}
+			<SvelteDrawUiButton {...props} type="icon">
+				<SvelteDrawUiButtonIcon icon="dots-vertical" />
+			</SvelteDrawUiButton>
+		{/snippet}
+	</SvelteDrawUiPopoverTrigger>
+	<SvelteDrawUiPopoverContent side="bottom">
+		<div style="padding: 8px">Popover content here</div>
+	</SvelteDrawUiPopoverContent>
+</SvelteDrawUiPopover>
+```
+
+The `id` prop is required and used to track the popover's open state. The `side` prop on `SvelteDrawUiPopoverContent` is required and controls which side of the trigger the popover appears on.
+
+### SvelteDrawUiDropdownMenu
+
+[SvelteDrawUiDropdownMenuRoot](?) and its companions build a dropdown menu on [bits-ui](https://bits-ui.com). Triggers and items take a `child` snippet that receives `props` to spread onto your element:
+
+```svelte
+<SvelteDrawUiDropdownMenuRoot id="my-dropdown">
+	<SvelteDrawUiDropdownMenuTrigger>
+		{#snippet child({ props })}
+			<SvelteDrawUiButton {...props} type="normal">
+				<SvelteDrawUiButtonLabel>Options</SvelteDrawUiButtonLabel>
+			</SvelteDrawUiButton>
+		{/snippet}
+	</SvelteDrawUiDropdownMenuTrigger>
+	<SvelteDrawUiDropdownMenuContent>
+		<SvelteDrawUiDropdownMenuGroup>
+			<SvelteDrawUiDropdownMenuItem>
+				{#snippet child({ props })}
+					<SvelteDrawUiButton {...props} type="menu" onclick={handleEdit}>
+						<SvelteDrawUiButtonLabel>Edit</SvelteDrawUiButtonLabel>
+					</SvelteDrawUiButton>
+				{/snippet}
+			</SvelteDrawUiDropdownMenuItem>
+			<SvelteDrawUiDropdownMenuItem>
+				{#snippet child({ props })}
+					<SvelteDrawUiButton {...props} type="menu" onclick={handleDuplicate}>
+						<SvelteDrawUiButtonLabel>Duplicate</SvelteDrawUiButtonLabel>
+					</SvelteDrawUiButton>
+				{/snippet}
+			</SvelteDrawUiDropdownMenuItem>
+			<SvelteDrawUiDropdownMenuItem>
+				{#snippet child({ props })}
+					<SvelteDrawUiButton {...props} type="menu" onclick={handleDelete}>
+						<SvelteDrawUiButtonLabel>Delete</SvelteDrawUiButtonLabel>
+					</SvelteDrawUiButton>
+				{/snippet}
+			</SvelteDrawUiDropdownMenuItem>
+		</SvelteDrawUiDropdownMenuGroup>
+	</SvelteDrawUiDropdownMenuContent>
+</SvelteDrawUiDropdownMenuRoot>
+```
+
+The `id` prop is required on `SvelteDrawUiDropdownMenuRoot`. Each `SvelteDrawUiDropdownMenuItem` renders the element you provide in its `child` snippet (typically a button) and handles the dropdown behavior.
+
+Other exported primitives include [SvelteDrawUiToolbar](?) and [SvelteDrawUiToolbarButton](?), [SvelteDrawUiTooltip](?), [SvelteDrawUiSelect](?), [SvelteDrawUiContextualToolbar](?), and the dropdown submenu and checkbox item components.
+
+## Related examples
+
+- [UI primitives](/examples/ui/ui-primitives) - A showcase of the UI primitive components
+- [Custom menus](/examples/ui/custom-menus) - Add items to svelte-draw's menus using menu primitives
+- [Toasts and dialogs](/examples/ui/toasts-and-dialogs) - Show toasts and custom dialogs
+- [Custom UI](/examples/ui/custom-ui) - Build a completely custom interface

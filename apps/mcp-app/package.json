@@ -1,0 +1,43 @@
+{
+	"name": "mcp-app",
+	"version": "1.0.0",
+	"mcpName": "io.github.svelte-draw/svelte-draw",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"extract-api": "tsx scripts/extract-editor-api.ts",
+		"generate-agent-sdk-docs": "pnpm exec tsc --build ../../packages/editor/tsconfig.json ../../packages/store/tsconfig.json ../../packages/tlschema/tsconfig.json && pnpm extract-api",
+		"build:widget": "pnpm generate-agent-sdk-docs && vite build && mv dist/index.html dist/mcp-app.html",
+		"build": "pnpm build:widget",
+		"dev": "pnpm dev:http",
+		"dev:http": "pnpm build && wrangler dev --var \"MCP_IS_DEV:true\" --var \"WORKER_ORIGIN:http://localhost:8787\"",
+		"dev:tunnel": "pnpm build && bash dev-tunnel.sh",
+		"deploy": "pnpm build && wrangler deploy",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/ext-apps": "^1.0.0",
+		"@modelcontextprotocol/sdk": "1.29.0",
+		"@svelte-draw/assets": "workspace:*",
+		"agents": "^0.19.0",
+		"zod": "^4.1.8"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20260302.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@types/node": "^22.15.31",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"svelte-draw": "workspace:*",
+		"tsx": "^4.19.2",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16",
+		"vite-plugin-singlefile": "^2.3.2",
+		"vitest": "^5.0.0",
+		"wrangler": "^4.75.0"
+	}
+}

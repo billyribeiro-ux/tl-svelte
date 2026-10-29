@@ -1,0 +1,27 @@
+{
+	"$schema": "https://turborepo.com/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		"build": {
+			"dependsOn": [
+				"$TURBO_EXTENDS$",
+				"@svelte-draw/collaboration#build-api",
+				"@svelte-draw/commenting#build-api",
+				"@svelte-draw/driver#build-api",
+				"@svelte-draw/editor#build-api",
+				"@svelte-draw/mentions#build-api",
+				"@svelte-draw/mermaid#build-api",
+				"@svelte-draw/state#build-api",
+				"@svelte-draw/store#build-api",
+				"@svelte-draw/sync#build-api",
+				"@svelte-draw/sync-collaboration#build-api",
+				"@svelte-draw/sync-core#build-api",
+				"@svelte-draw/svelte-draw#build-api",
+				"@svelte-draw/tlschema#build-api",
+				"@svelte-draw/utils#build-api",
+				"@svelte-draw/validate#build-api",
+				"svelte-draw#build-api"
+			]
+		}
+	}
+}

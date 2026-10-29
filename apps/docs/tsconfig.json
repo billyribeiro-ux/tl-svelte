@@ -1,0 +1,34 @@
+{
+	"extends": ["$app/tsconfig", "../../internal/config/tsconfig.base.json"],
+	"include": [
+		"src",
+		"scripts",
+		"utils",
+		"types",
+		"version.ts",
+		"watcher.ts",
+		"vite.config.ts",
+		"vite-plugin-docs-sidebar.ts",
+		"vitest.config.ts",
+		".svelte-kit/ambient.d.ts",
+		".svelte-kit/non-ambient.d.ts",
+		".svelte-kit/types/**/$types.d.ts"
+	],
+	"exclude": ["node_modules", "build", ".svelte-kit/output"],
+	"compilerOptions": {
+		"composite": false,
+		"incremental": false,
+		"declaration": false,
+		"declarationMap": false,
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noImplicitReturns": false,
+		"allowJs": true,
+		"strictNullChecks": true,
+		"rootDirs": [".", "./.svelte-kit/types"],
+		"types": ["node", "vitest/globals", "$app/types"]
+	}
+}

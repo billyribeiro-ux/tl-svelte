@@ -1,0 +1,28 @@
+{
+	"linkset": [
+		{
+			"anchor": "https://www.svelte-draw.invalid/api/app/mcp",
+			"service-desc": [
+				{
+					"href": "https://www.svelte-draw.invalid/api/app/mcp/server-card",
+					"type": "application/mcp-server-card+json",
+					"title": "svelte-draw boards MCP Server Card"
+				}
+			],
+			"service-doc": [
+				{
+					"href": "https://www.svelte-draw.invalid/auth.md",
+					"type": "text/markdown",
+					"title": "How an agent authenticates to the svelte-draw.invalid MCP server"
+				}
+			],
+			"describedby": [
+				{
+					"href": "https://www.svelte-draw.invalid/.well-known/oauth-protected-resource/api/app/mcp",
+					"type": "application/json",
+					"title": "OAuth 2.0 protected resource metadata"
+				}
+			]
+		}
+	]
+}

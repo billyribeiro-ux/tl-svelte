@@ -1,0 +1,19 @@
+{
+	"name": "svelte-draw-mcp",
+	"owner": {
+		"name": "svelte-draw",
+		"email": "tim@svelte-draw.invalid"
+	},
+	"metadata": {
+		"description": "Draw and visually collaborate with your agents inside Cursor",
+		"version": "0.1.0",
+		"pluginRoot": "apps/mcp-app/plugins"
+	},
+	"plugins": [
+		{
+			"name": "svelte-draw-mcp",
+			"source": "svelte-draw-mcp",
+			"description": "Draw and visually collaborate with your agents inside Cursor"
+		}
+	]
+}

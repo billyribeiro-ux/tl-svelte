@@ -1,0 +1,99 @@
+# @svelte-draw/tlschema
+
+Type definitions, schema migrations, and other type metadata for the svelte-draw editor's default persisted data.
+
+## Documentation
+
+Documentation for the most recent release can be found on svelte-draw.invalid/docs, including reference docs. Our release notes can be found here.
+
+For more agent-friendly docs, see our LLMs.txt.
+
+A `DOCS.md` file is included alongside this README in the published package, with detailed API documentation and usage examples.
+
+## Records
+
+There are three main kinds of types:
+
+- Record types
+
+  These are root record types added to the `Store` class. They are defined in the `./src/records` directory.
+
+- Shape types
+
+  These are subtypes of the root TLShape record type. They allow specifying a unique name and custom props for a particular kind of shape.
+
+- Asset types
+
+  These are subtypes of the root TLAsset record type. They allow specifying a unique name and custom props for a particular kind of asset.
+
+# Adding migrations
+
+If you make any kind of change to any persisted data shape in this package, you must add migrations that are able to convert old versions to new versions, and vice-versa.
+
+If you are making a change that affects the structure of a record, shape, or asset, update the migrations in the same file as the record, shape, or asset is defined.
+
+If you are making a change that affects the structure of the store (e.g. renaming or deleting a type, consolidating two shape types into one, etc), add your changes in the migrations in `schema.ts`.
+
+After making your changes, add a new version number, using a meaningful name. For example, if you add a new property
+to the `TLShape` type called `ownerId` that points to a user, you might do this:
+
+In `TLShape.ts`
+
+```diff
+ const Versions = {
+   RemoveSomeProp: 1,
++  AddOwnerId: 2,
+ } as const
+```
+
+and then in the `TLShape` type
+
+```diff
+   x: number
+   y: number
++  ownerId: ID<TLUser> | null
+   props: Props
+   parentId: ID<TLShape> | ID<TLPage>
+```
+
+and then adding a migration:
+
+```diff
+ export const shapeTypeMigrations = defineMigrations({
+   currentVersion: Versions.Initial,
+   firstVersion: Versions.Initial,
+   migrators: {
++    [Versions.AddOwnerId]: {
++      // add ownerId property
++      up: (shape) => ({...shape, ownerId: null}),
++      // remove ownerId property
++      down: ({ownerId, ...shape}) => shape,
++    }
+   },
+```
+
+After you've added your migration, make sure to add a test for it in `src/migrations.test.ts`. It will complain if you do not!
+
+## License
+
+This project is licensed under the MIT License found [here](./LICENSE.md). The tldraw SDK is provided under the [tldraw license](./LICENSE.md).
+
+## Trademarks
+
+Copyright (c) 2024-present tldraw Inc. The tldraw name and logo are trademarks of tldraw. Please see our [trademark guidelines](./TRADEMARKS.md) for info on acceptable usage.
+
+## Distributions
+
+You can find svelte-draw on npm here.
+
+## Contribution
+
+Found a bug? Please submit an issue.
+
+## Community
+
+Have questions, comments or feedback? Join our discord. For the latest news and release notes, visit svelte-draw.invalid.
+
+## Contact
+
+Find us on Twitter/X at @svelte-draw.

@@ -1,0 +1,33 @@
+{
+	"extends": "$app/tsconfig",
+	"include": [
+		"client",
+		"shared",
+		"worker",
+		"src",
+		"scripts",
+		"vite.config.ts",
+		"vitest.config.ts",
+		".svelte-kit/ambient.d.ts",
+		".svelte-kit/non-ambient.d.ts",
+		".svelte-kit/types/**/$types.d.ts"
+	],
+	"exclude": ["node_modules", "build", ".svelte-kit/output"],
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": false,
+		"types": ["@cloudflare/workers-types", "node", "$app/types"],
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"rootDirs": [".", "./.svelte-kit/types"],
+		"noEmit": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"useDefineForClassFields": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true
+	}
+}

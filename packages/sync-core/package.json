@@ -1,0 +1,77 @@
+{
+	"name": "@svelte-draw/sync-core",
+	"description": "svelte-draw infinite canvas SDK (multiplayer sync).",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"svelteDraw_product": {
+		"stableId": "svelte-draw:sync",
+		"name": "Sync",
+		"type": "feature",
+		"parent": "svelte-draw:sdk-core",
+		"premium": false
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"sdk",
+		"drawing",
+		"app",
+		"development",
+		"whiteboard",
+		"canvas",
+		"infinite"
+	],
+	"/* NOTE */": "These `main` and `types` fields are rewritten by the build script. They are not the actual values we publish",
+	"main": "./src/index.ts",
+	"types": "./.tsbuild/index.d.ts",
+	"type": "module",
+	"/* GOTCHA */": "files will include ./dist and index.d.ts by default, add any others you want to include in here",
+	"files": [],
+	"scripts": {
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build": "pnpm exec tsx ../../internal/scripts/build-package.ts",
+		"build-api": "pnpm exec tsx ../../internal/scripts/build-api.ts",
+		"prepack": "pnpm exec tsx ../../internal/scripts/prepack.ts",
+		"postpack": "../../internal/scripts/postpack.sh",
+		"pack-tarball": "pnpm pack",
+		"build-types": "tsc --build && svelte-check --tsconfig ./tsconfig.test.json --threshold error"
+	},
+	"devDependencies": {
+		"@peculiar/webcrypto": "^1.5.0",
+		"@svelte-draw/editor": "workspace:*",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@types/uuid-readable": "^0.0.3",
+		"@types/ws": "^8.18.1",
+		"fake-indexeddb": "^4.0.2",
+		"resize-observer-polyfill": "^1.5.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"svelte-draw": "workspace:*",
+		"typescript": "6.0.3",
+		"uuid-by-string": "^4.0.0",
+		"uuid-readable": "^0.0.2",
+		"vitest": "^5.0.0"
+	},
+	"dependencies": {
+		"@svelte-draw/state": "workspace:*",
+		"@svelte-draw/store": "workspace:*",
+		"@svelte-draw/tlschema": "workspace:*",
+		"@svelte-draw/utils": "workspace:*",
+		"nanoevents": "^7.0.1",
+		"ws": "^8.18.0"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	}
+}

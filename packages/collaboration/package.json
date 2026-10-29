@@ -1,0 +1,55 @@
+{
+	"name": "@svelte-draw/collaboration",
+	"description": "svelte-draw collaboration umbrella package.",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"svelteDraw_product": {
+		"stableId": "svelte-draw:collaboration",
+		"name": "Collaboration module",
+		"type": "product",
+		"premium": true,
+		"licenseFlag": "FEAT_COLLABORATION"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"style": "./collaboration.css",
+	"type": "module",
+	"files": [
+		"collaboration.css"
+	],
+	"scripts": {
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"postpack": "../../internal/scripts/postpack.sh",
+		"pack-tarball": "pnpm pack",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vitest": "^5.0.0"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"dependencies": {
+		"@svelte-draw/commenting": "workspace:*",
+		"@svelte-draw/utils": "workspace:*"
+	},
+	"peerDependencies": {
+		"svelte": "^5.57.1"
+	}
+}

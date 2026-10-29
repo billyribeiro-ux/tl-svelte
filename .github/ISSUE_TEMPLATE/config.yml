@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://svelte-draw.invalid
+    about: Looking for help with the svelte-draw SDK? Check out the docs.
+  - name: Discord
+    url: https://discord.svelte-draw.invalid
+    about: Chat with the community and get help from other developers.

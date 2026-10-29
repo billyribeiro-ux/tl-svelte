@@ -1,0 +1,35 @@
+
+name = "multiplayer-template"
+main = "worker/worker.ts"
+compatibility_date = "2025-05-08"
+compatibility_flags = ["nodejs_compat"]
+upload_source_maps = true
+preview_urls = true
+
+[[routes]]
+pattern = "multiplayer.templates.svelte-draw.invalid"
+custom_domain = true
+
+[observability]
+enabled = true
+
+[assets]
+not_found_handling = "single-page-application"
+directory = "./build"
+
+# Set up the durable object used for each svelte-draw room
+[durable_objects]
+bindings = [{ name = "SVELTE_DRAW_DURABLE_OBJECT", class_name = "SvelteDrawDurableObject" }]
+
+# Durable objects require migrations to create/modify/delete them
+# Using new_sqlite_classes for SQLite-backed storage
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SvelteDrawDurableObject"]
+
+# We store asset uploads (images, videos) in an R2 bucket.
+# Room data is stored in Durable Object SQLite storage.
+[[r2_buckets]]
+binding = 'SVELTE_DRAW_BUCKET'
+bucket_name = 'multiplayer-template'
+preview_bucket_name = 'multiplayer-template-preview'

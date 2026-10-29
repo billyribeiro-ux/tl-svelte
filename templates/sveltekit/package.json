@@ -1,0 +1,42 @@
+{
+	"name": "svelte-draw-sveltekit-app-example",
+	"private": true,
+	"version": "0.0.0",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "MIT",
+	"type": "module",
+	"svelteDraw_template": {
+		"repo": "billyribeiro-ux/tl-svelte",
+		"cli": {
+			"name": "Basic",
+			"description": "A minimal svelte-draw template with SvelteKit and TypeScript.",
+			"order": 1
+		},
+		"scripts": {
+			"lint": null,
+			"build-types": null
+		},
+		"path": "templates/sveltekit"
+	},
+	"scripts": {
+		"dev": "vite dev --host",
+		"build": "vite build",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"preview": "vite preview",
+		"build-types": "svelte-kit sync && ! svelte-check --tsconfig ./tsconfig.json --threshold error --output machine | grep ' ERROR ' | grep -v '\"../../packages'"
+	},
+	"dependencies": {
+		"@svelte-draw/assets": "workspace:*",
+		"svelte-draw": "workspace:*"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-static": "4.0.0",
+		"@sveltejs/kit": "3.1.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16"
+	}
+}

@@ -1,0 +1,327 @@
+---
+title: Internationalization
+created_at: 12/29/2025
+updated_at: 12/29/2025
+keywords:
+  - i18n
+  - internationalization
+  - localization
+  - translations
+  - language
+  - locale
+  - rtl
+status: published
+date: 12/29/2025
+readability: 9
+voice: 9
+completeness: 9
+accuracy: 9
+notes: Consider linking to an i18n example if one exists.
+---
+
+SvelteDraw's UI supports 49 languages out of the box, including right-to-left languages like Arabic, Hebrew, Farsi, and Urdu. The translation system loads language files on demand, detects the user's browser language, and lets you override any translation string or add custom ones.
+
+## Setting the locale
+
+The user's locale is stored in [user preferences](/sdk-features/user-preferences). By default, svelte-draw detects the browser's language and selects the closest match from supported languages. The default main menu also includes a language submenu where users can change it.
+
+To set the locale from your application, update the user's locale preference. The UI reads its language from `editor.user.getLocale()`, so this takes effect immediately:
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw
+		onMount={(editor) => {
+			// Change the locale to French
+			editor.user.updateUserPreferences({ locale: 'fr' })
+
+			// Get the current locale
+			const locale = editor.user.getLocale() // "fr"
+		}}
+	/>
+</div>
+```
+
+The `locale` value uses lowercase language codes: `'en'`, `'fr'`, `'de'`, `'ja'`, `'zh-cn'`, `'ar'`, and so on.
+
+The `SvelteDraw` component also has a `locale` prop. Today it only sets the language for the outer translation provider (used by the loading screen); the editor UI itself keeps reading the user preference, so prefer `updateUserPreferences` to change the visible language.
+
+### Automatic detection
+
+When no locale is set, svelte-draw uses [getDefaultTranslationLocale](?) to detect the user's preferred language from the browser:
+
+```ts
+import { getDefaultTranslationLocale } from 'svelte-draw'
+
+// Returns 'fr', 'en', 'zh-cn', etc. based on browser settings
+const locale = getDefaultTranslationLocale()
+```
+
+For each entry in the browser's `navigator.languages` array, in order, it:
+
+1. Tries an exact match against supported languages
+2. Falls back to a language-only match (e.g., `'fr-CA'` → `'fr'`)
+3. Applies region defaults for Chinese (`'zh'` → `'zh-cn'`), Portuguese (`'pt'` → `'pt-br'`), Korean (`'ko'` → `'ko-kr'`), and Hindi (`'hi'` → `'hi-in'`)
+
+The first entry that matches wins. If none match, it defaults to `'en'`.
+
+## Using translations in components
+
+The [getTranslation](?) function, called during component initialization, returns a function for looking up translation strings. Unknown keys are returned as-is, so you can pass plain text or your own keys:
+
+```svelte
+<script lang="ts">
+	import { getTranslation } from 'svelte-draw'
+
+	const msg = getTranslation()
+</script>
+
+<button>{msg('action.copy')}</button>
+```
+
+Pass a second argument to fill in a message's placeholders:
+
+```svelte
+<script lang="ts">
+	import { getTranslation } from 'svelte-draw'
+
+	let { count }: { count: number } = $props()
+
+	const msg = getTranslation()
+</script>
+
+<p>{msg('a11y.multiple-shapes', { num: count })}</p>
+```
+
+### Rendering a message as an element
+
+[F](?) renders a message where it belongs in the markup, with its English alongside:
+
+```svelte
+<script lang="ts">
+	import { F } from 'svelte-draw'
+</script>
+
+<button>
+	<F defaultMessage="Copy" id="action.copy" />
+</button>
+```
+
+Where a string is needed instead — an `aria-label`, a `title`, a `placeholder` — pass the declared message to the function returned by [getTranslation](?). If the current locale has no translation for it yet, its `defaultMessage` is used:
+
+```svelte
+<script lang="ts">
+	import { defineMessages, getTranslation } from 'svelte-draw'
+
+	const messages = defineMessages({
+		close: { id: 'ui.close', defaultMessage: 'Close' },
+	})
+
+	const msg = getTranslation()
+</script>
+
+<button aria-label={msg(messages.close)}></button>
+```
+
+Both resolve against the same translations, so an override reaches each of them.
+
+Use [getCurrentTranslation](?) for the full translation object, including locale and text direction. It returns a holder whose `current` is the translation object and whose `locale` is the requested locale; read them in the template or a `$derived`:
+
+```svelte
+<script lang="ts">
+	import { getCurrentTranslation } from 'svelte-draw'
+
+	const translation = getCurrentTranslation()
+</script>
+
+<div dir={translation.current.dir}>
+	<p>Locale: {translation.current.locale}</p>
+	<p>Label: {translation.current.label}</p>
+</div>
+```
+
+The [TLUiTranslation](?) object contains a `locale` code (e.g., `'fr'`), a `label` in the native script (e.g., `'Français'`), a `messages` record with all translation strings, and a `dir` indicating text direction (`'ltr'` or `'rtl'`).
+
+### Generated message ids
+
+The SDK's own messages have hand-written ids, because an app overrides by id and an id has to survive a reworded English string. An app's own messages needn't: if you use [@formatjs/unplugin](https://formatjs.github.io/docs/tooling/bundler-plugins) with an `idInterpolationPattern`, your bundler derives each id from the message's own text, and you can leave it out.
+
+```svelte
+<script lang="ts">
+	import { defineMessages, F } from 'svelte-draw'
+
+	const messages = defineMessages({
+		// No id: the plugin injects one at build.
+		welcome: { defaultMessage: 'Welcome back' },
+	})
+</script>
+
+<F {...messages.welcome} />
+```
+
+Where no plugin ran either — a unit test, normally — the English stands in as the id. It matches nothing in any catalogue, so the message renders as that English rather than failing.
+
+## Overriding translations
+
+Pass translation overrides through the `overrides` prop on `SvelteDraw`:
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+</script>
+
+<SvelteDraw
+	overrides={{
+		translations: {
+			en: {
+				'action.copy': 'Copy to clipboard',
+				'action.paste': 'Paste from clipboard',
+			},
+			fr: {
+				'action.copy': 'Copier dans le presse-papiers',
+			},
+		},
+	}}
+/>
+```
+
+Overrides are merged with the base translations for each language. English is the fallback: any key missing from the target language uses the English string. If you add your own keys (for example a custom tool label), provide at least an `en` override for them.
+
+Your strings are ICU messages too, so they can pluralise and take placeholders. A `{` that isn't opening a placeholder has to be escaped as `'{'`, or the message won't parse — a message that fails to parse renders as written rather than disappearing.
+
+## Message format
+
+Messages are [ICU MessageFormat](https://unicode-org.github.io/icu/userguide/format_parse/messages/), so a single message can say the right thing for any number:
+
+```json
+{
+	"comments.replies": "{count, plural, one {# reply} other {# replies}}"
+}
+```
+
+```ts
+msg('comments.replies', { count: 1 }) // "1 reply"
+msg('comments.replies', { count: 4 }) // "4 replies"
+```
+
+This matters beyond English. A language picks between its own plural categories, which is why one string per number doesn't travel: Arabic has six, Polish four, Russian three. ICU asks the locale which category a number falls into, so the translator writes each form their language needs and the right one is chosen at runtime.
+
+`select` chooses between fixed options rather than numbers:
+
+```json
+{
+	"my.app.greeting": "{gender, select, female {She} male {He} other {They}} shared a file"
+}
+```
+
+Numbers and dates are formatted for the locale as well:
+
+```json
+{
+	"my.app.fileCount": "{count, number} files",
+	"my.app.lastEdited": "Edited {when, date, medium}"
+}
+```
+
+> Use `#` inside a plural to print the number being matched. Outside a plural it's a literal `#`.
+
+A message's `defaultMessage` is its English, and it's formatted as English. The translation from the catalog is what gets the user's locale and its plural categories, so a locale missing a string falls back to readable English rather than to English grammar applied to another language.
+
+### Translation keys
+
+Translation keys follow a hierarchical naming convention. Common prefixes include `action.*` for user actions like copy and paste, `tool.*` for tool names, `menu.*` for menu labels, `style-panel.*` for style panel UI, and `a11y.*` for accessibility announcements.
+
+The [TLUiTranslationKey](?) type provides autocomplete for all available keys:
+
+```ts
+import type { TLUiTranslationKey } from 'svelte-draw'
+
+const key: TLUiTranslationKey = 'action.copy'
+```
+
+## Supported languages
+
+Import [LANGUAGES](?) from `svelte-draw` for the complete list of supported languages:
+
+```svelte
+<script lang="ts">
+	import { LANGUAGES } from 'svelte-draw'
+</script>
+
+<select>
+	{#each LANGUAGES as { locale, label } (locale)}
+		<option value={locale}>{label}</option>
+	{/each}
+</select>
+```
+
+Each entry in `LANGUAGES` is a [TLLanguage](?) with a `locale` code and a `label` in that language's native script. Translation files are only loaded for locales in this list, so you can't add a new language by supplying a translation file alone.
+
+The supported languages include: English, Spanish, French, German, Italian, Portuguese (Brazilian and European), Dutch, Russian, Polish, Czech, Danish, Finnish, Swedish, Hungarian, Norwegian, Romanian, Turkish, Ukrainian, Greek, Croatian, Slovenian, Arabic, Hebrew, Farsi, Urdu, Hindi, Tamil, Telugu, Malayalam, Kannada, Bengali, Gujarati, Nepali, Marathi, Punjabi, Thai, Khmer, Vietnamese, Indonesian, Malay, Filipino, Somali, Japanese, Korean, Simplified Chinese, Traditional Chinese (Taiwan), Catalan, and Galician.
+
+## Right-to-left support
+
+Languages like Arabic, Hebrew, Farsi, and Urdu automatically set `dir: 'rtl'` in the translation object. The svelte-draw UI respects this direction. Layout and text alignment mirror automatically. The `dir` attribute is set on the editor's root container, and the built-in components use CSS logical properties (`margin-inline-start`, `inset-inline-end`, and so on) so they flip without per-component code.
+
+When building custom UI components, call [getDirection](?) to get the current text direction. It returns a holder whose `current` is `'ltr'` or `'rtl'` from the active translation context, the same value as `getCurrentTranslation().current.dir`:
+
+```svelte
+<script lang="ts">
+	import { getDirection } from 'svelte-draw'
+
+	const dir = getDirection()
+</script>
+
+<aside dir={dir.current}>
+	<!-- Panel content -->
+</aside>
+```
+
+Use `getCurrentTranslation` instead when you also need the locale, label, or `messages`.
+
+## Building a language picker
+
+Here's a language picker that updates the user's locale preference:
+
+```svelte
+<script lang="ts">
+	import { LANGUAGES, fromComputed, getEditor } from 'svelte-draw'
+
+	const editor = getEditor()
+	const currentLocale = fromComputed('locale', () => editor.user.getLocale())
+</script>
+
+<select
+	value={currentLocale.current}
+	onchange={(e) => {
+		editor.user.updateUserPreferences({ locale: e.currentTarget.value })
+	}}
+>
+	{#each LANGUAGES as { locale, label } (locale)}
+		<option value={locale}>{label}</option>
+	{/each}
+</select>
+```
+
+The language change applies immediately without a page reload. The preference persists to localStorage and synchronizes across browser tabs.
+
+## Translation loading
+
+Translations load asynchronously when the locale changes. The system:
+
+1. Fetches the translation JSON file for the selected locale
+2. Merges it with English translations (ensuring all keys have values)
+3. Applies any custom overrides
+4. Updates the translation context
+
+During loading, the UI uses the previous translations to avoid flicker. If loading fails, English remains as the fallback.
+
+To use translations outside the full svelte-draw UI, wrap your components in [SvelteDrawUiTranslationProvider](?) (inside an `AssetUrlsProvider`).
+
+## Related examples
+
+- [Custom translations and overrides](/examples/ui/custom-language-translations) - Override translation strings and use them in custom UI.

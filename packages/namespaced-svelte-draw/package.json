@@ -1,0 +1,62 @@
+{
+	"name": "@svelte-draw/svelte-draw",
+	"description": "A tiny little drawing editor.",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"svelteDraw_product": {
+		"stableId": "svelte-draw:sdk-core",
+		"name": "SDK",
+		"type": "product",
+		"premium": false
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"sdk",
+		"drawing",
+		"app",
+		"development",
+		"whiteboard",
+		"canvas",
+		"infinite"
+	],
+	"/* NOTE */": "These `main` and `types` fields are rewritten by the build script. They are not the actual values we publish",
+	"main": "./src/index.ts",
+	"types": "./.tsbuild/index.d.ts",
+	"type": "module",
+	"scripts": {
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"build": "pnpm exec tsx ../../internal/scripts/build-package.ts",
+		"build-api": "pnpm exec tsx ../../internal/scripts/build-api.ts",
+		"prepack": "pnpm exec tsx ../../internal/scripts/prepack.ts",
+		"postpack": "../../internal/scripts/postpack.sh",
+		"pack-tarball": "pnpm pack",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+	},
+	"files": [
+		"svelte-draw.css"
+	],
+	"dependencies": {
+		"svelte-draw": "workspace:*"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3"
+	}
+}

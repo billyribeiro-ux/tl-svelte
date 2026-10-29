@@ -1,0 +1,544 @@
+---
+title: Collaboration
+created_at: 12/26/2025
+updated_at: 12/29/2025
+keywords:
+  - multiplayer
+  - sync
+  - collaboration
+  - real-time
+  - presence
+  - cursors
+  - websocket
+  - custom sync
+  - store listeners
+  - RecordsDiff
+status: published
+date: 12/26/2025
+readability: 9
+voice: 8
+completeness: 9
+accuracy: 9
+notes: Some sections could be more direct.
+---
+
+The `@svelte-draw/sync` package provides real-time multiplayer collaboration for svelte-draw. Multiple users can edit the same document simultaneously, see each other's cursors, and follow each other's viewports. The sync system handles connection management, conflict resolution, and presence.
+
+Collaboration requires a server component to coordinate changes between clients. Use svelte-draw's demo server for prototyping, or run your own server for production.
+
+## Quick start with the demo server
+
+The fastest way to add multiplayer is with [createSyncDemo](?). It connects to a hosted demo server that handles synchronization. Call it during component initialization with a function that returns the options, and pass `sync.current` to the `store` prop:
+
+```svelte
+<script lang="ts">
+	import { createSyncDemo } from '@svelte-draw/sync'
+	import { SvelteDraw } from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+
+	const sync = createSyncDemo(() => ({ roomId: 'my-room-id' }))
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw store={sync.current} />
+</div>
+```
+
+Anyone who opens the app with the same `roomId` will see the same document and each other's cursors. The demo server is great for prototyping, but data is deleted after a day and rooms are publicly accessible by ID. Don't use it in production.
+
+## Production setup with createSync
+
+For production, use [createSync](?) with your own server:
+
+```svelte
+<script lang="ts">
+	import { createSync } from '@svelte-draw/sync'
+	import { SvelteDraw } from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+
+	let { roomId }: { roomId: string } = $props()
+
+	const sync = createSync(() => ({
+		uri: `wss://your-server.com/sync/${roomId}`,
+		assets: myAssetStore,
+	}))
+</script>
+
+{#if sync.current.status === 'loading'}
+	<div>Connecting...</div>
+{:else if sync.current.status === 'error'}
+	<div>Connection error: {sync.current.error.message}</div>
+{:else}
+	<div style="position: fixed; inset: 0">
+		<SvelteDraw store={sync.current.store} />
+	</div>
+{/if}
+```
+
+`createSync` returns an object whose `current` is a [RemoteTLStoreWithStatus](?) with three possible states. Because the options are passed as a function, the connection follows reactive values such as `roomId`.
+
+| Status          | Description                                                    |
+| --------------- | -------------------------------------------------------------- |
+| `loading`       | Establishing connection and performing initial sync            |
+| `synced-remote` | Connected and syncing. Includes `store` and `connectionStatus` |
+| `error`         | Connection failed. Includes `error` with details               |
+
+### Asset storage
+
+Production setups require a [TLAssetStore](?) for handling images, videos, and other files:
+
+```ts
+const myAssetStore: TLAssetStore = {
+	upload: async (asset, file) => {
+		const response = await fetch('/api/upload', {
+			method: 'POST',
+			body: file,
+		})
+		const { url } = await response.json()
+		return { src: url }
+	},
+	resolve: (asset, context) => {
+		// context includes dpr, networkEffectiveType, and shouldResolveToOriginal
+		return asset.props.src
+	},
+}
+
+const sync = createSync(() => ({
+	uri: `wss://your-server.com/sync/${roomId}`,
+	assets: myAssetStore,
+}))
+```
+
+See the [Assets](/docs/assets) documentation for more on implementing asset stores.
+
+## User identity
+
+By default, users get a default name and a random color, stored in localStorage. To customize this, pass a [TLUserStore](?) as `users`, whose methods return reactive `Signal` values:
+
+```ts
+import { computed, UserRecordType, createUserId } from 'svelte-draw'
+
+const currentUser = computed('currentUser', () =>
+	UserRecordType.create({
+		id: createUserId('user-123'),
+		name: 'Alice',
+		color: '#ff0000',
+	})
+)
+
+const sync = createSyncDemo(() => ({
+	roomId: 'my-room',
+	users: {
+		currentUser,
+	},
+}))
+```
+
+The `users` store is also used for shape attribution — the same `currentUser` signal stamps shapes with user IDs. See the [Attribution](/sdk-features/attribution) page for details on tracking which users create or edit shapes. Provide a `resolve` method to look up other users by ID:
+
+```ts
+const users: TLUserStore = {
+	currentUser: myAuth.currentUser$,
+	resolve: (userId) => myUserCache.getSignal(userId),
+}
+```
+
+### Integrating with createSvelteDrawCurrentUser
+
+If you need to let users edit their preferences through svelte-draw's UI, use [createSvelteDrawCurrentUser](?):
+
+```svelte
+<script lang="ts">
+	import { createSyncDemo } from '@svelte-draw/sync'
+	import { untrack } from 'svelte'
+	import {
+		atom,
+		computed,
+		createSvelteDrawCurrentUser,
+		createUserId,
+		SvelteDraw,
+		UserRecordType,
+		type TLUserPreferences,
+		type TLUserStore,
+	} from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+
+	let { roomId }: { roomId: string } = $props()
+
+	let userPreferences = $state<TLUserPreferences>({
+		id: 'user-123',
+		name: 'Alice',
+		color: 'coral',
+		colorScheme: 'dark',
+	})
+
+	// A TLUserStore needs a signal, so mirror the Svelte state into an atom
+	const userPrefsAtom = atom<TLUserPreferences>(
+		'userPrefs',
+		untrack(() => $state.snapshot(userPreferences))
+	)
+	$effect(() => {
+		userPrefsAtom.set($state.snapshot(userPreferences))
+	})
+
+	const currentUser = computed('currentUser', () => {
+		const p = userPrefsAtom.get()
+		return UserRecordType.create({
+			id: createUserId(p.id),
+			name: p.name ?? '',
+			color: p.color ?? '',
+		})
+	})
+	const users: TLUserStore = { currentUser }
+
+	const sync = createSyncDemo(() => ({ roomId, users }))
+	const user = createSvelteDrawCurrentUser(() => ({
+		userPreferences: $state.snapshot(userPreferences),
+		setUserPreferences: (next) => {
+			userPreferences = next
+		},
+	}))
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw store={sync.current} user={user.current} />
+</div>
+```
+
+## Connection status
+
+When using `createSync`, `sync.current` includes connection status information:
+
+```ts
+const sync = createSync(() => ({ uri, assets }))
+
+if (sync.current.status === 'synced-remote') {
+	// sync.current.connectionStatus is 'online' or 'offline'
+	console.log('Connection:', sync.current.connectionStatus)
+}
+```
+
+The connection status reflects the WebSocket connection state. When offline, changes are queued locally and sync when the connection resumes.
+
+## Custom presence
+
+The presence system controls what information is shared with other users. By default, it includes cursor position, selected shapes, and viewport bounds. You can customize this with `getUserPresence`, starting from [getDefaultUserPresence](?):
+
+```ts
+import { getDefaultUserPresence } from 'svelte-draw'
+
+const sync = createSyncDemo(() => ({
+	roomId: 'my-room',
+	getUserPresence(store, user) {
+		const defaults = getDefaultUserPresence(store, user)
+		if (!defaults) return null
+
+		return {
+			...defaults,
+			// Remove camera/viewport to disable follow functionality
+			camera: undefined,
+		}
+	},
+}))
+```
+
+Return `null` from `getUserPresence` to hide this user's presence entirely. This is useful for spectator modes where you want a user to observe without appearing in the room.
+
+## Authentication
+
+To add authentication, generate the WebSocket URI dynamically:
+
+```ts
+const sync = createSync(() => ({
+	uri: async () => {
+		const token = await getAuthToken()
+		return `wss://your-server.com/sync/${roomId}?token=${token}`
+	},
+	assets: myAssetStore,
+}))
+```
+
+The `uri` option accepts a function that returns a string or Promise. This runs when establishing the connection and on reconnection, so tokens can refresh automatically.
+
+## Running your own server
+
+For production, you'll need to run a sync server. The `@svelte-draw/sync-core` package provides [TLSocketRoom](?) for server-side room management.
+
+Our Cloudflare Workers template is the same setup that runs svelte-draw.invalid. It includes:
+
+- WebSocket sync via Durable Objects (one per room)
+- Asset storage with R2
+- Bookmark unfurling for URL previews
+
+Get started with the template:
+
+```bash
+npm create svelte-draw@latest -- --template multiplayer
+```
+
+Or copy the relevant pieces into your existing infrastructure. See [Sync](/docs/sync) for other server setups.
+
+### Server architecture
+
+The sync server uses a room-based model:
+
+1. Each document has a unique room ID
+2. Clients connect via WebSocket to their room
+3. The server maintains one `TLSocketRoom` per active room
+4. Changes broadcast to all connected clients in real-time
+5. The server is authoritative for conflict resolution
+
+```
+┌─────────┐     ┌─────────────────┐     ┌─────────┐
+│ Client  │────▶│   TLSocketRoom  │◀────│ Client  │
+└─────────┘     │   (per room)    │     └─────────┘
+                └────────┬────────┘
+                         │
+                    ┌────▼────┐
+                    │ Storage │
+                    └─────────┘
+```
+
+## Custom shapes and bindings
+
+If you use custom shapes or bindings, register them with the sync functions using schema options:
+
+```svelte
+<script lang="ts">
+	import { createSyncDemo } from '@svelte-draw/sync'
+	import { SvelteDraw } from 'svelte-draw'
+	import { MyCustomShapeUtil } from './MyCustomShape'
+	import { MyCustomBindingUtil } from './MyCustomBinding'
+
+	let { roomId }: { roomId: string } = $props()
+
+	const customShapes = [MyCustomShapeUtil]
+	const customBindings = [MyCustomBindingUtil]
+
+	const sync = createSyncDemo(() => ({
+		roomId,
+		shapeUtils: customShapes,
+		bindingUtils: customBindings,
+	}))
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw store={sync.current} shapeUtils={customShapes} bindingUtils={customBindings} />
+</div>
+```
+
+Pass the shape and binding utilities to both the sync function (for schema registration) and the SvelteDraw component (for rendering). If they don't match, shapes may fail to sync or render correctly.
+
+`createSyncDemo` adds svelte-draw's default utilities for you. `createSync` doesn't: when you pass `shapeUtils` or `bindingUtils` to `createSync`, include the defaults yourself, for example `shapeUtils: [...defaultShapeUtils, MyCustomShapeUtil]`.
+
+## Comments
+
+Comment threads sync the same way, through record types you opt into with the `records` option:
+
+```ts
+import { createSync } from '@svelte-draw/sync'
+import { commentSchemaRecords } from 'svelte-draw'
+
+const sync = createSync(() => ({
+	uri: `wss://your-server.com/sync/${roomId}`,
+	assets: myAssetStore,
+	records: commentSchemaRecords,
+}))
+```
+
+Your server's schema needs the same registration. On the server you can also serve comments through the room's object-store lane, which gates them by their own per-session permission. A viewer who can't edit the document can still comment. See [Commenting](/sdk-features/commenting) for the tool, the canvas layer, and the server setup.
+
+## Building custom sync
+
+The `@svelte-draw/sync` package handles connection management, reconnection, conflict resolution, and protocol versioning. For most applications, it's the right choice. You might need custom sync when integrating with existing infrastructure, using a different transport (like WebRTC), or implementing specialized conflict resolution.
+
+svelte-draw's store provides the primitives you need to build your own sync layer.
+
+### Listening to changes
+
+The store's [Store#listen](?) method notifies you when records change:
+
+```ts
+const unsubscribe = editor.store.listen(
+	(entry) => {
+		// entry.changes contains all modifications
+		// entry.source is 'user' (local) or 'remote'
+		console.log('Changes:', entry.changes)
+	},
+	{ source: 'user', scope: 'document' }
+)
+
+// Later: stop listening
+unsubscribe()
+```
+
+Filter options narrow what changes you receive:
+
+| Filter   | Values                                           | Description               |
+| -------- | ------------------------------------------------ | ------------------------- |
+| `source` | `'user'`, `'remote'`, `'all'`                    | Who made the change       |
+| `scope`  | `'document'`, `'session'`, `'presence'`, `'all'` | What type of data changed |
+
+For sync, you typically want `source: 'user'` (only local changes) and `scope: 'document'` (only persistent data).
+
+### Change structure
+
+Changes arrive as a [RecordsDiff](?) object with three categories:
+
+```ts
+interface RecordsDiff<R> {
+	added: Record<string, R> // New records
+	updated: Record<string, [from: R, to: R]> // Changed records (before/after)
+	removed: Record<string, R> // Deleted records
+}
+```
+
+Each entry is keyed by record ID. For updates, you get both the previous and current state, which is useful for conflict detection or generating patches.
+
+### Applying remote changes
+
+When you receive changes from other clients, wrap them in [Store#mergeRemoteChanges](?):
+
+```ts
+function applyRemoteChanges(records: TLRecord[], deletedIds: TLRecord['id'][]) {
+	editor.store.mergeRemoteChanges(() => {
+		if (records.length > 0) {
+			editor.store.put(records)
+		}
+		if (deletedIds.length > 0) {
+			editor.store.remove(deletedIds)
+		}
+	})
+}
+```
+
+This marks the changes as `'remote'` source, so your own listener won't echo them back to the server. It also batches the operations into a single transaction, and remote changes never enter the undo/redo history.
+
+### Snapshots and serialization
+
+For initial sync or persistence, serialize the entire store:
+
+```ts
+// Get all document records as a plain object
+const data = editor.store.serialize('document')
+// Returns: { 'shape:abc': {...}, 'page:xyz': {...}, ... }
+
+// Get a snapshot with schema information (recommended for persistence)
+const snapshot = editor.store.getStoreSnapshot('document')
+// Returns: { store: {...}, schema: {...} }
+
+// Restore from snapshot (handles migrations automatically)
+editor.store.loadStoreSnapshot(snapshot)
+```
+
+The snapshot format includes schema information, so svelte-draw can automatically migrate old data when your schema evolves.
+
+### Presence records
+
+User presence (cursors, selections, viewports) uses [InstancePresenceRecordType](?) records. Only `userId`, `userName`, and `currentPageId` are required; everything else has a default:
+
+```ts
+import { createUserId, InstancePresenceRecordType } from 'svelte-draw'
+
+// Create a presence record for a remote user, keyed by that client's session id
+const presence = InstancePresenceRecordType.create({
+	id: InstancePresenceRecordType.createId(remoteSessionId),
+	userId: createUserId('user-123'),
+	userName: 'Alice',
+	color: '#ff6b6b',
+	currentPageId: editor.getCurrentPageId(),
+	cursor: { x: 100, y: 200, type: 'default', rotation: 0 },
+	lastActivityTimestamp: Date.now(),
+})
+
+// Add to store
+editor.store.put([presence])
+
+// Update cursor position
+editor.store.update(presence.id, (record) => ({
+	...record,
+	cursor: { x: 150, y: 250, type: 'default', rotation: 0 },
+}))
+
+// Remove when user disconnects
+editor.store.remove([presence.id])
+```
+
+Listen for presence changes separately from document changes:
+
+```ts
+editor.store.listen(
+	(entry) => {
+		// Broadcast presence to other clients
+		sendPresence(entry.changes)
+	},
+	{ source: 'user', scope: 'presence' }
+)
+```
+
+### Example: simple broadcast sync
+
+Here's a minimal example using a WebSocket for broadcast sync (no conflict resolution):
+
+```svelte
+<script lang="ts">
+	import { createTLStore, defaultBindingUtils, defaultShapeUtils, SvelteDraw } from 'svelte-draw'
+	import 'svelte-draw/svelte-draw.css'
+
+	const store = createTLStore({
+		shapeUtils: defaultShapeUtils,
+		bindingUtils: defaultBindingUtils,
+	})
+
+	$effect(() => {
+		const ws = new WebSocket('wss://your-server.com/room/123')
+
+		// Send local changes to server
+		const unsubscribe = store.listen(
+			(entry) => {
+				ws.send(
+					JSON.stringify({
+						type: 'changes',
+						added: Object.values(entry.changes.added),
+						updated: Object.values(entry.changes.updated).map(([, to]) => to),
+						removed: Object.keys(entry.changes.removed),
+					})
+				)
+			},
+			{ source: 'user', scope: 'document' }
+		)
+
+		// Apply remote changes
+		ws.onmessage = (event) => {
+			const msg = JSON.parse(event.data)
+			if (msg.type === 'changes') {
+				store.mergeRemoteChanges(() => {
+					if (msg.added.length || msg.updated.length) {
+						store.put([...msg.added, ...msg.updated])
+					}
+					if (msg.removed.length) {
+						store.remove(msg.removed)
+					}
+				})
+			}
+		}
+
+		return () => {
+			unsubscribe()
+			ws.close()
+		}
+	})
+</script>
+
+<SvelteDraw {store} />
+```
+
+This example omits initial state sync, reconnection handling, and conflict resolution. For production, start with `@svelte-draw/sync` and customize it, or study its implementation for how it handles these cases.
+
+## Related examples
+
+- [Multiplayer sync](/examples/collaboration/sync-demo) — Basic multiplayer setup with the demo server
+- [Custom user](/examples/users/sync-custom-user) — Setting custom user identity for multiplayer
+- [Custom presence](/examples/collaboration/sync-custom-presence) — Customizing presence data sent to collaborators
+- [Custom shapes](/examples/collaboration/sync-custom-shape) — Syncing custom shapes with multiplayer
+- [User presence](/examples/collaboration/user-presence) — Manually creating and updating presence records

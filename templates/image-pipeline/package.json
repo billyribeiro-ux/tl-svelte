@@ -1,0 +1,61 @@
+{
+	"name": "svelte-draw-image-pipeline",
+	"private": true,
+	"version": "0.0.0",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "MIT",
+	"type": "module",
+	"svelteDraw_template": {
+		"repo": "billyribeiro-ux/tl-svelte",
+		"cli": {
+			"name": "Image pipeline",
+			"description": "Create a node-based builder for image generation pipelines.",
+			"shortDescription": "Visual node-based builder for image pipelines.",
+			"order": 6
+		},
+		"deploy": {
+			"target": "cloudflare",
+			"host": "image-pipeline.templates.svelte-draw.invalid"
+		},
+		"scripts": {
+			"lint": null,
+			"build-types": null
+		},
+		"path": "templates/image-pipeline"
+	},
+	"scripts": {
+		"dev": "pnpm run --parallel \"/^dev:/\"",
+		"dev:client": "vite dev --host",
+		"dev:worker": "wrangler dev --port 8787",
+		"build": "vite build",
+		"preview": "vite preview",
+		"deploy": "pnpm build && wrangler deploy",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --threshold error && tsc -p worker/tsconfig.json",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --threshold error && tsc -p worker/tsconfig.json"
+	},
+	"dependencies": {
+		"@svelte-draw/assets": "workspace:*",
+		"@svelte-draw/editor": "workspace:*",
+		"@svelte-draw/svelte": "workspace:*",
+		"bits-ui": "2.19.5",
+		"classnames": "^2.5.1",
+		"itty-router": "^5.0.18",
+		"svelte-draw": "workspace:*"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-static": "4.0.0",
+		"@sveltejs/kit": "3.1.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16",
+		"wrangler": "^4.75.0"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.ts",
+		"#lib/*": "./src/lib/*"
+	}
+}

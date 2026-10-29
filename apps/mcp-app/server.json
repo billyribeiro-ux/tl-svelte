@@ -1,0 +1,21 @@
+{
+	"$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+	"name": "io.github.svelte-draw/svelte-draw",
+	"description": "Draw and visually collaborate with your agents on svelte-draw's canvas.",
+	"repository": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte",
+		"source": "github",
+		"subfolder": "apps/mcp-app"
+	},
+	"version": "0.1.0",
+	"remotes": [
+		{
+			"type": "streamable-http",
+			"url": "https://svelte-draw-mcp-app.svelte-draw.invalid/mcp"
+		},
+		{
+			"type": "sse",
+			"url": "https://svelte-draw-mcp-app.svelte-draw.invalid/sse"
+		}
+	]
+}

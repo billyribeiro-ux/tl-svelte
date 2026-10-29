@@ -1,0 +1,105 @@
+---
+title: Collaboration
+status: published
+author: alex
+date: 7/24/2024
+order: 6
+keywords:
+  - data
+  - sync
+  - persistence
+  - database
+  - multiplayer
+  - collaboration
+  - server
+  - websockets
+---
+
+The svelte-draw SDK supports real-time collaboration. Add collaboration to your project with our [svelte-draw sync](/docs/sync) library, or use our low-level data APIs to integrate other backends.
+
+<MaskedArticleImage
+	gifSrc="/images/multiplayer.gif"
+	maskSrc="/images/multiplayer_mask.png"
+	alt="Multiplayer example using svelte-draw sync"
+/>
+
+## Quick start
+
+The fastest way to add multiplayer is with the `createSyncDemo` function from [`@svelte-draw/sync`](/docs/sync). This connects to a hosted demo server that handles synchronization.
+
+```bash
+npm install @svelte-draw/sync
+```
+
+```svelte
+<script lang="ts">
+	import { SvelteDraw } from 'svelte-draw'
+	import { createSyncDemo } from '@svelte-draw/sync'
+	import 'svelte-draw/svelte-draw.css'
+
+	const sync = createSyncDemo(() => ({ roomId: 'my-company-my-unique-room-id' }))
+</script>
+
+<div style="position: fixed; inset: 0">
+	<SvelteDraw store={sync.current} />
+</div>
+```
+
+Any apps connecting to the same room ID will enter a shared collaboration session. The room ID namespace is shared by everyone using the demo server, so prefix it with your company or project name. Open your project in an incognito window or different browser to test it out.
+
+The demo server is great for prototyping, but data is deleted after about a day and rooms are publicly accessible. For production, you'll need to self-host the svelte-draw sync server. See our full guide on [svelte-draw sync](/docs/sync).
+
+## Comments
+
+Collaborators can also leave anchored comments on the canvas. The `@svelte-draw/commenting` package provides a comment tool and pins that stick to points and shapes. Each pin opens a thread popover with replies, mentions, reactions, and resolving, and a sidebar lists every thread.
+
+```svelte
+<!-- CommentsLayer.svelte -->
+<script lang="ts">
+	import { CanvasComments, type CommentAuthor } from '@svelte-draw/commenting'
+
+	// Your app's user directory, however you already hold it.
+	const AUTHORS: Record<string, CommentAuthor> = {
+		'user-123': { name: 'You', color: '#EC5E41' },
+	}
+</script>
+
+<CanvasComments currentUserId="user-123" resolveAuthor={(id) => AUTHORS[id]} />
+```
+
+```svelte
+<!-- App.svelte -->
+<script lang="ts">
+	import { commentToolOverrides, commentTools } from '@svelte-draw/commenting'
+	import { createSync } from '@svelte-draw/sync'
+	import { commentSchemaRecords, SvelteDraw, type TLComponents } from 'svelte-draw'
+	import '@svelte-draw/commenting/commenting.css'
+	import 'svelte-draw/svelte-draw.css'
+	import CommentsLayer from './CommentsLayer.svelte'
+
+	const components: TLComponents = { InFrontOfTheCanvas: CommentsLayer }
+
+	const sync = createSync(() => ({
+		uri: 'wss://your-server.com/sync/my-room',
+		assets: myAssetStore,
+		records: commentSchemaRecords,
+	}))
+</script>
+
+<SvelteDraw
+	store={sync.current}
+	tools={commentTools}
+	overrides={[commentToolOverrides]}
+	{components}
+/>
+```
+
+Comment records are opt-in, so register `commentSchemaRecords` on your server's schema too, and list the comment record types in the room's `objectTypes` (see [Comments and the object-store lane](/docs/sync#Comments-and-the-object-store-lane)). Commenting is a licensed feature. See the [commenting overview](/docs/commenting) for an introduction, or the [commenting reference](/sdk-features/commenting) for anchors, options, and server setup.
+
+## Using other backends
+
+While [svelte-draw sync](/docs/sync) is our recommended solution, the svelte-draw SDK works with any real-time data backend. For example, Liveblocks offers a svelte-draw integration, and many teams have connected svelte-draw to their own infrastructure.
+
+A custom backend has to handle a few things. Document changes need to get in and out of the [store](/sdk-features/store); see [Persistence](/docs/persistence) for the basics and the [collaboration deep dive](/sdk-features/collaboration) for building custom sync. Presence (cursor positions, selections, viewports) is shared through presence records, covered in the same deep dive; [Cursors](/sdk-features/cursors) explains how to customize collaborator cursors, and [User following](/sdk-features/user-following) covers tracking another user's viewport.
+
+The visual side is handled by the default UI. Override components like `SharePanel` through [UI components](/sdk-features/ui-components). The [OverlayUtil](?) system renders collaborator cursors, brushes, scribbles, and selection indicators; see [Overlay utils](/sdk-features/overlay-utils).

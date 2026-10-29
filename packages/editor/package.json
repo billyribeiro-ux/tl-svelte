@@ -1,0 +1,78 @@
+{
+	"name": "@svelte-draw/editor",
+	"description": "svelte-draw infinite canvas SDK (editor).",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"svelteDraw_product": {
+		"stableId": "svelte-draw:sdk-core",
+		"name": "SDK",
+		"type": "product",
+		"premium": false
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"sdk",
+		"drawing",
+		"app",
+		"development",
+		"whiteboard",
+		"canvas",
+		"infinite"
+	],
+	"/* NOTE */": "These `main` and `types` fields are rewritten by the build script. They are not the actual values we publish",
+	"main": "./src/index.ts",
+	"types": "./.tsbuild/index.d.ts",
+	"style": "./editor.css",
+	"type": "module",
+	"/* GOTCHA */": "files will include ./dist and index.d.ts by default, add any others you want to include in here",
+	"files": [
+		"editor.css"
+	],
+	"scripts": {
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"build": "pnpm exec tsx ../../internal/scripts/build-package.ts",
+		"build-api": "pnpm exec tsx ../../internal/scripts/build-api.ts",
+		"prepack": "pnpm exec tsx ../../internal/scripts/prepack.ts",
+		"postpack": "../../internal/scripts/postpack.sh",
+		"pack-tarball": "pnpm pack",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "tsc --build"
+	},
+	"dependencies": {
+		"@tiptap/core": "^3.12.1",
+		"@tiptap/pm": "^3.12.1",
+		"@svelte-draw/state": "workspace:*",
+		"@svelte-draw/store": "workspace:*",
+		"@svelte-draw/tlschema": "workspace:*",
+		"@svelte-draw/utils": "workspace:*",
+		"@svelte-draw/validate": "workspace:*",
+		"classnames": "^2.5.1",
+		"eventemitter3": "^4.0.7",
+		"idb": "^7.1.1",
+		"is-plain-object": "^5.0.0",
+		"rbush": "^3.0.1"
+	},
+	"devDependencies": {
+		"@peculiar/webcrypto": "^1.5.0",
+		"@testing-library/dom": "^10.0.0",
+		"@types/rbush": "^3.0.0",
+		"@types/wicg-file-system-access": "^2020.9.8",
+		"fake-indexeddb": "^4.0.2",
+		"resize-observer-polyfill": "^1.5.1",
+		"vitest": "^5.0.0"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	}
+}

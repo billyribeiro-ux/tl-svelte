@@ -1,0 +1,64 @@
+{
+	"name": "@svelte-draw/assets",
+	"description": "svelte-draw infinite canvas SDK (assets).",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"svelteDraw_product": {
+		"stableId": "svelte-draw:sdk-core",
+		"name": "SDK",
+		"type": "product",
+		"premium": false
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"sdk",
+		"drawing",
+		"app",
+		"development",
+		"whiteboard",
+		"canvas",
+		"infinite"
+	],
+	"files": [
+		"embed-icons",
+		"icons",
+		"fonts",
+		"translations",
+		"imports.js",
+		"imports.d.ts",
+		"imports.vite.js",
+		"imports.vite.d.ts",
+		"selfHosted.js",
+		"selfHosted.d.ts",
+		"types.d.ts",
+		"urls.js",
+		"urls.d.ts",
+		"utils.js",
+		"utils.d.ts"
+	],
+	"scripts": {
+		"pack-tarball": "pnpm pack",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"build-types": "tsc --build"
+	},
+	"dependencies": {
+		"@svelte-draw/utils": "workspace:*"
+	},
+	"devDependencies": {
+		"ts-node-dev": "^1.1.8",
+		"typescript": "^7.0.2"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	}
+}

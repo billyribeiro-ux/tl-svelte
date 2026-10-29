@@ -1,0 +1,64 @@
+{
+	"name": "@svelte-draw/mermaid",
+	"description": "Mermaid diagram to svelte-draw shape conversion.",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"svelteDraw_product": {
+		"stableId": "svelte-draw:mermaid",
+		"name": "Mermaid",
+		"type": "feature",
+		"parent": "svelte-draw:sdk-core",
+		"premium": false
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"mermaid",
+		"diagram",
+		"canvas",
+		"infinite"
+	],
+	"/* NOTE */": "These `main` and `types` fields are rewritten by the build script. They are not the actual values we publish",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"type": "module",
+	"/* GOTCHA */": "files will include ./dist and index.d.ts by default, add any others you want to include in here",
+	"files": [],
+	"scripts": {
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"postpack": "../../internal/scripts/postpack.sh",
+		"pack-tarball": "pnpm pack",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+	},
+	"dependencies": {
+		"@svelte-draw/tlschema": "workspace:*",
+		"@svelte-draw/utils": "workspace:*",
+		"mermaid": "11.16.1"
+	},
+	"peerDependencies": {
+		"svelte": "^5.57.1",
+		"svelte-draw": "workspace:*"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"svelte-draw": "workspace:*",
+		"typescript": "6.0.3",
+		"vitest": "^5.0.0"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	}
+}

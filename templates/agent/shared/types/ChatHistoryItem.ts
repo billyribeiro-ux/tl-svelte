@@ -1,0 +1,41 @@
+import type { JsonValue, RecordsDiff, TLRecord } from 'svelte-draw'
+import type { FocusedShape } from '../format/FocusedShape'
+import type { AgentAction } from './AgentAction'
+import type { AgentRequestSource } from './AgentRequest'
+import type { ContextItem } from './ContextItem'
+import type { Streaming } from './Streaming'
+
+export type ChatHistoryItem =
+	| ChatHistoryActionItem
+	| ChatHistoryPromptItem
+	| ChatHistoryContinuationItem
+
+/**
+ * A prompt from a user, another agent, or the agent itself.
+ */
+export interface ChatHistoryPromptItem {
+	type: 'prompt'
+	promptSource: AgentRequestSource
+	agentFacingMessage: string
+	userFacingMessage: string | null
+	contextItems: ContextItem[]
+	selectedShapes: FocusedShape[]
+}
+
+/**
+ * An action done by the agent.
+ */
+export interface ChatHistoryActionItem {
+	type: 'action'
+	action: Streaming<AgentAction>
+	diff: RecordsDiff<TLRecord>
+	acceptance: 'pending' | 'accepted' | 'rejected'
+}
+
+/**
+ * A follow-up request from the agent, with data retrieved from the previous request.
+ */
+export interface ChatHistoryContinuationItem {
+	type: 'continuation'
+	data: JsonValue[]
+}

@@ -1,0 +1,88 @@
+main = "src/worker.ts"
+compatibility_date = "2024-06-20"
+
+[dev]
+port = 8789
+
+[[analytics_engine_datasets]]
+binding = "MEASURE"
+
+#################### Environment names ####################
+# dev should never actually get deployed anywhere
+[env.dev]
+name = 'svelte-drawusercontent-dev'
+services = [{ binding = "SYNC_WORKER", service = "dev-svelte-draw-multiplayer" }]
+
+# we don't have a hard-coded name for preview. we instead have to generate it at build time and append it to this file.
+
+[env.staging]
+name = "staging-svelte-drawusercontent"
+services = [{ binding = "SYNC_WORKER", service = "main-svelte-draw-multiplayer" }]
+
+# production gets the proper name
+[env.production]
+name = "svelte-drawusercontent"
+services = [{ binding = "SYNC_WORKER", service = "svelte-draw-multiplayer" }]
+
+#################### Assets R2 bucket ####################
+# in dev, we write to the preview bucket and need a `preview_bucket_name`
+[[env.dev.r2_buckets]]
+binding = 'UPLOADS'
+bucket_name = 'uploads-preview'
+preview_bucket_name = 'uploads-preview'
+
+# in preview and staging we write to the preview bucket
+[[env.preview.r2_buckets]]
+binding = 'UPLOADS'
+bucket_name = 'uploads-preview'
+
+[[env.staging.r2_buckets]]
+binding = 'UPLOADS'
+bucket_name = 'uploads-preview'
+
+# in production, we write to the main bucket
+[[env.production.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "uploads"
+
+#################### Analytics engine ####################
+# analytics engine has the same configuration in all environments:
+[[env.dev.analytics_engine_datasets]]
+binding = "MEASURE"
+
+[[env.preview.analytics_engine_datasets]]
+binding = "MEASURE"
+
+[[env.staging.analytics_engine_datasets]]
+binding = "MEASURE"
+
+[[env.production.analytics_engine_datasets]]
+binding = "MEASURE"
+
+#################### Routes ####################
+# in production, we use a custom domain. others get a default *.svelte-draw.invalid domain
+[[env.production.routes]]
+pattern = 'svelte-drawusercontent.invalid'
+custom_domain = true
+zone_name = 'svelte-drawusercontent.invalid'
+
+[[env.staging.routes]]
+pattern = 'staging.svelte-drawusercontent.invalid'
+custom_domain = true
+zone_name = 'svelte-drawusercontent.invalid'
+
+#################### Version metadata ####################
+[version_metadata]
+binding = "CF_VERSION_METADATA"
+
+[env.dev.version_metadata]
+binding = "CF_VERSION_METADATA"
+
+[env.preview.version_metadata]
+binding = "CF_VERSION_METADATA"
+
+[env.staging.version_metadata]
+binding = "CF_VERSION_METADATA"
+
+[env.production.version_metadata]
+binding = "CF_VERSION_METADATA"

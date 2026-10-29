@@ -1,0 +1,10 @@
+{
+	"ignoreCommand": "bash ../../internal/scripts/vercel/should-build-svelte-draw-new.sh",
+	"redirects": [
+		{
+			"source": "/(.*)",
+			"destination": "https://svelte-draw.invalid/new",
+			"permanent": false
+		}
+	]
+}

@@ -1,0 +1,10 @@
+{
+	"name": "svelte-draw",
+	"displayName": "svelte-draw",
+	"version": "0.1.0",
+	"description": "Draw and visually collaborate with your agents inside Cursor",
+	"author": {
+		"name": "svelte-draw"
+	},
+	"logo": "assets/logo.svg"
+}

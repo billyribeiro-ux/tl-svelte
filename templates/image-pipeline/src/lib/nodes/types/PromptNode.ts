@@ -1,0 +1,57 @@
+import { T } from 'svelte-draw'
+import { PromptIcon } from '../../components/icons/icons.svelte'
+import { NODE_HEADER_HEIGHT_PX, NODE_ROW_HEIGHT_PX, NODE_WIDTH_PX } from '../../constants'
+import type { ShapePort } from '../../ports/Port'
+import { sleep } from '../../utils/sleep'
+import type { NodeShape } from '../NodeShapeUtil'
+import PromptNodeComponent from './PromptNodeComponent.svelte'
+import { type ExecutionResult, type InfoValues, NodeDefinition } from './shared'
+
+export type PromptNode = T.TypeOf<typeof PromptNode>
+export const PromptNode = T.object({
+	type: T.literal('prompt'),
+	text: T.string,
+})
+
+export class PromptNodeDefinition extends NodeDefinition<PromptNode> {
+	static type = 'prompt'
+	static validator = PromptNode
+	title = 'Prompt'
+	heading = 'Prompt'
+	icon = PromptIcon
+	category = 'input'
+	getDefault(): PromptNode {
+		return {
+			type: 'prompt',
+			text: 'a photo of a cat sitting on a windowsill',
+		}
+	}
+	getBodyHeightPx() {
+		return NODE_ROW_HEIGHT_PX * 2
+	}
+	getPorts(): Record<string, ShapePort> {
+		return {
+			output: {
+				id: 'output',
+				x: NODE_WIDTH_PX,
+				y: NODE_HEADER_HEIGHT_PX / 2,
+				terminal: 'start',
+				dataType: 'text',
+			},
+		}
+	}
+	async execute(_shape: NodeShape, node: PromptNode): Promise<ExecutionResult> {
+		await sleep(200)
+		return { output: node.text }
+	}
+	getOutputInfo(shape: NodeShape, node: PromptNode): InfoValues {
+		return {
+			output: {
+				value: node.text,
+				isOutOfDate: shape.props.isOutOfDate,
+				dataType: 'text',
+			},
+		}
+	}
+	Component = PromptNodeComponent
+}

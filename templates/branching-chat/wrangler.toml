@@ -1,0 +1,12 @@
+name = "branching-chat-template"
+main = "worker/worker.ts"
+compatibility_date = "2024-12-30"
+assets = { directory = "./build", not_found_handling = "single-page-application" }
+preview_urls = true
+
+[observability]
+enabled = true
+
+[[routes]]
+pattern = "branching-chat.templates.svelte-draw.invalid"
+custom_domain = true

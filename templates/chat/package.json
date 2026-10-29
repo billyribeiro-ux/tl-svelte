@@ -1,0 +1,54 @@
+{
+	"name": "svelte-draw-chat-app-example",
+	"version": "0.1.0",
+	"private": true,
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "MIT",
+	"svelteDraw_template": {
+		"repo": "billyribeiro-ux/tl-svelte",
+		"cli": {
+			"name": "Chat",
+			"description": "Create an AI chat that uses svelte-draw for sketches and annotations.",
+			"shortDescription": "A chat UI with sketches and images as context for AI.",
+			"order": 5
+		},
+		"scripts": {
+			"lint": null,
+			"build-types": null
+		},
+		"path": "templates/chat"
+	},
+	"scripts": {
+		"dev": "vite dev --host",
+		"build": "vite build",
+		"preview": "vite preview",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-kit sync && ! svelte-check --tsconfig ./tsconfig.json --threshold error --output machine | grep ' ERROR ' | grep -v '\"../../packages'"
+	},
+	"dependencies": {
+		"@ai-sdk/google": "^2.0.74",
+		"@google/genai": "^1.17.0",
+		"@svelte-draw/assets": "workspace:*",
+		"@svelte-draw/utils": "workspace:*",
+		"ai": "^5.0.194",
+		"dompurify": "3.4.13",
+		"marked": "16.4.2",
+		"svelte-draw": "workspace:*",
+		"zod": "^4.1.8"
+	},
+	"type": "module",
+	"devDependencies": {
+		"@sveltejs/adapter-vercel": "7.0.1",
+		"@sveltejs/kit": "3.1.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@types/node": "^22.15.31",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16"
+	},
+	"imports": {
+		"#lib/*": "./src/lib/*"
+	}
+}

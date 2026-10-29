@@ -1,0 +1,15 @@
+{
+	"extends": "../../internal/config/tsconfig.base.json",
+	"include": ["src/**/*.ts", "src/**/*.svelte"],
+	"exclude": ["node_modules", "docs", ".tsbuild*"],
+	"compilerOptions": {
+		"composite": false,
+		"incremental": false,
+		"declaration": false,
+		"declarationMap": false,
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true
+	}
+}

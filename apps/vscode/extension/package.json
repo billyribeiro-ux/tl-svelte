@@ -1,0 +1,168 @@
+{
+	"name": "svelte-draw-vscode",
+	"description": "The svelte-draw extension for VS Code.",
+	"version": "2.0.36",
+	"private": true,
+	"author": "billyribeiro-ux",
+	"license": "MIT",
+	"homepage": "https://svelte-draw.invalid",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"keywords": [
+		"svelte-draw",
+		"sdk",
+		"drawing",
+		"app",
+		"development",
+		"whiteboard",
+		"canvas",
+		"infinite"
+	],
+	"displayName": "svelte-draw",
+	"publisher": "svelte-draw-org",
+	"icon": "icon.png",
+	"galleryBanner": {
+		"color": "#1d1d1d",
+		"theme": "dark"
+	},
+	"categories": [
+		"Visualization"
+	],
+	"engines": {
+		"vscode": "^1.96.0"
+	},
+	"activationEvents": [],
+	"browser": "./dist/web/extension.js",
+	"main": "./dist/web/extension.js",
+	"extensionKind": [
+		"workspace"
+	],
+	"contributes": {
+		"customEditors": [
+			{
+				"viewType": "svelte-draw.tldr",
+				"displayName": "svelte-draw",
+				"selector": [
+					{
+						"filenamePattern": "*.tldr"
+					},
+					{
+						"filenamePattern": "*.tldr.json"
+					}
+				]
+			},
+			{
+				"viewType": "svelte-draw.svelte-draw-offline",
+				"displayName": "svelte-draw",
+				"selector": [
+					{
+						"filenamePattern": "*.svelte-draw"
+					}
+				]
+			}
+		],
+		"keybindings": [
+			{
+				"key": "ctrl+shift+d",
+				"mac": "cmd+shift+d",
+				"title": "Toggle Dark Mode",
+				"command": "svelte-draw.tldr.toggleDarkMode",
+				"category": "svelte-draw",
+				"when": "resourceExtname == .tldr"
+			},
+			{
+				"key": "ctrl+numpad_add",
+				"mac": "cmd+numpad_add",
+				"title": "Zoom In",
+				"command": "svelte-draw.tldr.zoomIn",
+				"category": "svelte-draw",
+				"when": "resourceExtname == .tldr"
+			},
+			{
+				"key": "ctrl+=",
+				"mac": "cmd+=",
+				"title": "Zoom In",
+				"command": "svelte-draw.tldr.zoomIn",
+				"category": "svelte-draw",
+				"when": "resourceExtname == .tldr"
+			},
+			{
+				"key": "ctrl+numpad_subtract",
+				"mac": "cmd+numpad_subtract",
+				"title": "Zoom Out",
+				"command": "svelte-draw.tldr.zoomOut",
+				"category": "svelte-draw",
+				"when": "resourceExtname == .tldr"
+			},
+			{
+				"key": "ctrl+-",
+				"mac": "cmd+-",
+				"title": "Zoom Out",
+				"command": "svelte-draw.tldr.zoomOut",
+				"category": "svelte-draw",
+				"when": "resourceExtname == .tldr"
+			},
+			{
+				"key": "ctrl+numpad0",
+				"mac": "cmd+numpad0",
+				"title": "Reset Zoom",
+				"command": "svelte-draw.tldr.resetZoom",
+				"category": "svelte-draw",
+				"when": "resourceExtname == .tldr"
+			}
+		],
+		"commands": [
+			{
+				"command": "svelte-draw.tldr.new",
+				"title": "New Project",
+				"category": "svelte-draw"
+			}
+		]
+	},
+	"vsce": {
+		"dependencies": false
+	},
+	"scripts": {
+		"dev": "tsx scripts/dev.ts",
+		"build": "cd ../editor && pnpm build && cd ../extension && tsx scripts/build.ts",
+		"get-info": "vsce show svelte-draw-org.svelte-draw-vscode --json > extension.json",
+		"package": "pnpm build && tsx scripts/package.ts",
+		"publish": "tsx scripts/publish.ts",
+		"lint": "pnpm exec tsx ../../../internal/scripts/lint.ts",
+		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf editor && rm -rf temp && pnpm install",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test-coverage": "pnpm exec vitest run --coverage --passWithNoTests",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+	},
+	"devDependencies": {
+		"@svelte-draw/editor": "workspace:*",
+		"@types/fs-extra": "^11.0.4",
+		"@types/lodash": "^4.17.14",
+		"@types/node-fetch": "^2.6.12",
+		"@types/vscode": "^1.96.0",
+		"assert": "^2.1.0",
+		"esbuild": "^0.28.0",
+		"fs-extra": "^11.3.0",
+		"lodash": "^4.17.21",
+		"mocha": "^9.2.2",
+		"ovsx": "^0.10.7",
+		"process": "^0.11.10",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"svelte-draw": "workspace:*",
+		"tsx": "^4.19.2",
+		"typescript": "6.0.3",
+		"vsce": "^2.15.0"
+	},
+	"gitHead": "4b1137849ad07da36fc8f0f19cb64e7535a79296",
+	"dependencies": {
+		"cheerio": "^1.0.0",
+		"node-fetch": "^2.7.0"
+	}
+}

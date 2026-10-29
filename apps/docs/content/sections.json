@@ -1,0 +1,453 @@
+[
+  {
+    "id": "getting-started",
+    "title": "Introduction",
+    "description": "Introduction articles for svelte-draw.",
+    "categories": [],
+    "sidebar_behavior": "show-links"
+  },
+  {
+    "id": "releases",
+    "title": "Releases",
+    "description": "Introduction articles for svelte-draw.",
+    "categories": [],
+    "sidebar_behavior": "hidden"
+  },
+  {
+    "id": "docs",
+    "title": "Learn svelte-draw",
+    "description": "Learn to use the svelte-draw SDK.",
+    "categories": [],
+    "sidebar_behavior": "show-links"
+  },
+  {
+    "id": "starter-kits",
+    "title": "Starter Kits",
+    "description": "Ready-to-use templates to jumpstart your svelte-draw projects.",
+    "categories": [],
+    "sidebar_behavior": "show-links"
+  },
+  {
+    "id": "sdk-features",
+    "title": "SDK features",
+    "description": "Detailed guides to svelte-draw's features and capabilities.",
+    "categories": [],
+    "sidebar_behavior": "show-links"
+  },
+  {
+    "id": "community",
+    "title": "Community",
+    "description": "Community resources for the svelte-draw SDK.",
+    "categories": [],
+    "sidebar_behavior": "show-links"
+  },
+  {
+    "id": "reference",
+    "title": "API Reference",
+    "description": "Reference for the svelte-draw package's APIs (generated).",
+    "categories": [
+      {
+        "id": "driver",
+        "title": "@svelte-draw/driver",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "editor",
+        "title": "@svelte-draw/editor",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "mermaid",
+        "title": "@svelte-draw/mermaid",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "state",
+        "title": "@svelte-draw/state",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "store",
+        "title": "@svelte-draw/store",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "sync",
+        "title": "@svelte-draw/sync",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "sync-core",
+        "title": "@svelte-draw/sync-core",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "svelte-draw",
+        "title": "svelte-draw",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "tlschema",
+        "title": "@svelte-draw/tlschema",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      },
+      {
+        "id": "validate",
+        "title": "@svelte-draw/validate",
+        "description": "",
+        "groups": [
+          {
+            "id": "Class",
+            "path": null
+          },
+          {
+            "id": "Function",
+            "path": null
+          },
+          {
+            "id": "Variable",
+            "path": null
+          },
+          {
+            "id": "Enum",
+            "path": null
+          },
+          {
+            "id": "Interface",
+            "path": null
+          },
+          {
+            "id": "TypeAlias",
+            "path": null
+          },
+          {
+            "id": "Namespace",
+            "path": null
+          },
+          {
+            "id": "Component",
+            "path": null
+          }
+        ],
+        "hero": null
+      }
+    ],
+    "sidebar_behavior": "reference",
+    "hero": null
+  }
+]

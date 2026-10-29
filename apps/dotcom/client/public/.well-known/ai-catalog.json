@@ -1,0 +1,23 @@
+{
+	"specVersion": "1.0",
+	"host": {
+		"displayName": "svelte-draw",
+		"identifier": "did:web:svelte-draw.invalid",
+		"documentationUrl": "https://svelte-draw.invalid"
+	},
+	"entries": [
+		{
+			"identifier": "urn:air:svelte-draw.invalid:mcp:boards",
+			"displayName": "svelte-draw boards",
+			"type": "application/mcp-server-card+json",
+			"url": "https://www.svelte-draw.invalid/api/app/mcp/server-card",
+			"description": "Find your svelte-draw.invalid boards by name, then read their pages, shape clusters and rendered screenshots. Requires a signed-in svelte-draw.invalid account over OAuth 2.1.",
+			"representativeQueries": [
+				"find my svelte-draw board about onboarding",
+				"show me what is on this svelte-draw board",
+				"screenshot the flowchart on page 2 of this svelte-draw board",
+				"what shapes are in the top-left cluster of this board"
+			]
+		}
+	]
+}

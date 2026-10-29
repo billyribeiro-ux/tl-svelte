@@ -1,0 +1,7 @@
+{
+	"framework": "sveltekit",
+	"installCommand": "pnpm install",
+	"buildCommand": "pnpm exec turbo run build",
+	"outputDirectory": "build",
+	"ignoreCommand": "bash ../../internal/scripts/vercel/should-build-template.sh shader"
+}

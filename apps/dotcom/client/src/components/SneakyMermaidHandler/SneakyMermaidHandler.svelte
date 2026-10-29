@@ -1,0 +1,81 @@
+<script lang="ts" module>
+	import { defineMessages } from 'svelte-draw'
+
+	const messages = defineMessages({
+		unsupportedTitle: { defaultMessage: 'Unsupported Mermaid diagram' },
+		unsupportedDescription: { defaultMessage: 'Unsupported diagram, will generate SVG instead' },
+	})
+</script>
+
+<script lang="ts">
+	import {
+		defaultHandleExternalTextContent,
+		getEditor,
+		getToasts,
+		getTranslation,
+	} from 'svelte-draw'
+	import { simpleMermaidStringTest, stripMarkdownMermaidFence } from './simpleMermaidStringTest'
+
+	const msg = getTranslation()
+	const editor = getEditor()
+	const { addToast } = getToasts()
+	const unsupportedTitle = $derived(msg(messages.unsupportedTitle))
+	const unsupportedDescription = $derived(msg(messages.unsupportedDescription))
+
+	$effect(() => {
+		const title = unsupportedTitle
+		const description = unsupportedDescription
+		editor.registerExternalContentHandler('text', async (content) => {
+			// when pasting html, the derived text is stripped and loses line breaks
+			// which make evaluating mermaid diagrams impossible. We look into the
+			// sources and see if there's some plain text alongside the html and if
+			// there are, we can use this to evaluate mermaid diagrams.
+
+			const plainTextSource = content.sources?.find(
+				(s) => s.type === 'text' && s.subtype === 'text'
+			)
+			const plainText = plainTextSource?.data ?? content.text
+			const textToTest = simpleMermaidStringTest(plainText) ? plainText : content.text
+
+			if (!simpleMermaidStringTest(textToTest)) {
+				await defaultHandleExternalTextContent(editor, content)
+				return
+			}
+			const mermaidText = stripMarkdownMermaidFence(textToTest)
+			const { createMermaidDiagram } = await import('@svelte-draw/mermaid')
+			const shapesBefore = new Set(editor.getCurrentPageShapeIds())
+
+			const selectNewShapes = () => {
+				const newShapeIds = [...editor.getCurrentPageShapeIds()].filter(
+					(id) => !shapesBefore.has(id)
+				)
+				if (newShapeIds.length) {
+					editor.setSelectedShapes(newShapeIds)
+				}
+			}
+
+			try {
+				const onUnsupportedDiagram = async (svgString: string) => {
+					await editor.putExternalContent({
+						type: 'svg-text',
+						text: svgString,
+						point: content.point,
+						sources: content.sources,
+					})
+					addToast({
+						id: 'unsupported-mermaid-diagram',
+						title,
+						description,
+						severity: 'warning',
+					})
+				}
+
+				await createMermaidDiagram(editor, mermaidText, { onUnsupportedDiagram })
+				selectNewShapes()
+			} catch (e) {
+				console.error(e)
+				await defaultHandleExternalTextContent(editor, content)
+			}
+		})
+	})
+</script>

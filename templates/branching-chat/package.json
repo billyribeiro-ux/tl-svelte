@@ -1,0 +1,61 @@
+{
+	"name": "svelte-draw-branching-chat",
+	"private": true,
+	"version": "0.0.0",
+	"author": "billyribeiro-ux",
+	"homepage": "https://svelte-draw.invalid",
+	"license": "MIT",
+	"type": "module",
+	"svelteDraw_template": {
+		"repo": "billyribeiro-ux/tl-svelte",
+		"cli": {
+			"name": "Branching chat",
+			"description": "Chat with an AI using a branching conversation interface.",
+			"shortDescription": "A branching chat interface.",
+			"order": 7
+		},
+		"deploy": {
+			"target": "cloudflare",
+			"host": "branching-chat.templates.svelte-draw.invalid"
+		},
+		"scripts": {
+			"lint": null,
+			"build-types": null
+		},
+		"path": "templates/branching-chat"
+	},
+	"scripts": {
+		"dev": "concurrently -k -n worker,client -c red,blue \"pnpm dev-worker\" \"pnpm dev-client\"",
+		"dev-worker": "vite dev --config vite.worker.config.ts",
+		"dev-client": "vite dev --host",
+		"build": "vite build",
+		"preview": "vite preview",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts",
+		"build-types": "svelte-kit sync && ! svelte-check --tsconfig ./tsconfig.json --threshold error --output machine | grep ' ERROR ' | grep -v '\"../../packages' && ! tsc -p worker/tsconfig.json | grep '^worker/'"
+	},
+	"dependencies": {
+		"@ai-sdk/google": "^2.0.74",
+		"@cloudflare/vite-plugin": "^1.29.1",
+		"@svelte-draw/assets": "workspace:*",
+		"ai": "^5.0.194",
+		"itty-router": "^5.0.18",
+		"svelte-draw": "workspace:*",
+		"wrangler": "^4.75.0",
+		"zod": "^4.1.8"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20260302.0",
+		"@sveltejs/adapter-static": "4.0.0",
+		"@sveltejs/kit": "3.1.0",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"concurrently": "^9.1.2",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vite": "^8.0.16"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.ts",
+		"#lib/*": "./src/lib/*"
+	}
+}

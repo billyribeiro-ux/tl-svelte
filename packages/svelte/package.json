@@ -1,0 +1,54 @@
+{
+	"name": "@svelte-draw/svelte",
+	"description": "svelte-draw infinite canvas SDK (Svelte 5 bindings).",
+	"version": "5.5.2",
+	"author": "billyribeiro-ux",
+	"license": "SEE LICENSE IN ../../LICENSE.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/billyribeiro-ux/tl-svelte"
+	},
+	"bugs": {
+		"url": "https://github.com/billyribeiro-ux/tl-svelte/issues"
+	},
+	"type": "module",
+	"svelte": "./src/lib/index.ts",
+	"types": "./src/lib/index.ts",
+	"exports": {
+		".": {
+			"types": "./src/lib/index.ts",
+			"svelte": "./src/lib/index.ts",
+			"default": "./src/lib/index.ts"
+		}
+	},
+	"imports": {
+		"#lib": "./src/lib/index.ts",
+		"#lib/*": "./src/lib/*"
+	},
+	"files": [],
+	"sideEffects": false,
+	"scripts": {
+		"test-ci": "pnpm exec vitest run --passWithNoTests",
+		"test": "pnpm exec vitest --passWithNoTests",
+		"build-types": "svelte-check --tsconfig ./tsconfig.json --threshold error",
+		"lint": "pnpm exec tsx ../../internal/scripts/lint.ts"
+	},
+	"dependencies": {
+		"@svelte-draw/store": "workspace:*",
+		"@svelte-draw/editor": "workspace:*",
+		"@svelte-draw/state": "workspace:*",
+		"@svelte-draw/tlschema": "workspace:*",
+		"@svelte-draw/utils": "workspace:*"
+	},
+	"peerDependencies": {
+		"svelte": "^5.57.1"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"jsdom": "^29.1.1",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.7",
+		"typescript": "6.0.3",
+		"vitest": "^5.0.0"
+	}
+}

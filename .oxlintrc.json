@@ -1,0 +1,462 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["unicorn", "typescript"],
+	"jsPlugins": ["./internal/scripts/oxlint/svelte-draw-plugin.mjs"],
+	"categories": {
+		"correctness": "off"
+	},
+	"options": {
+		"typeAware": true
+	},
+	"env": {
+		"builtin": true
+	},
+	"ignorePatterns": [
+		"skills/**/*",
+		".claude/**/*",
+		".agents/**/*",
+		".cursor/**/*",
+		"**/node_modules/*",
+		"**/out/*",
+		"**/dist/*",
+		"**/dist-cjs/*",
+		"**/dist-esm/*",
+		"**/.tsbuild*",
+		"**/.turbo/*",
+		"**/.next/*",
+		"**/.wrangler/*",
+		"**/.vercel/*",
+		"**/*.md",
+		"**/_archive/*",
+		"**/*.css.map",
+		"**/*.js.map",
+		"**/*.d.ts",
+		"**/api/*",
+		"!**/pages/api/*",
+		"**/*.json",
+		"**/next.config.js",
+		"**/setupTests.js",
+		"apps/vscode/extension/editor",
+		"apps/examples/www",
+		"apps/docs/api-content.json",
+		"apps/docs/content.json",
+		"apps/vscode/extension/editor/index.js",
+		"apps/vscode/extension/editor/svelte-draw-assets.json",
+		"**/sentry.server.config.js",
+		"**/scripts/upload-sourcemaps.js",
+		"**/scripts/lib/auto-plugin.js",
+		"**/coverage/**/*",
+		"apps/docs/postcss.config.js",
+		"apps/docs/tailwind.config.js",
+		"apps/dotcom/client/public/sw.js",
+		"apps/dotcom/client/public/theme-init.js",
+		"apps/analytics/public/*",
+		"**/.clasp.json",
+		"**/*.mjs",
+		"**/.*.js",
+		"packages/assets/*",
+		"packages/create-svelte-draw/cli.cjs",
+		"**/*/vitest.config.ts",
+		"**/*/setupVitest.js",
+		"**/*/zod-locales-shim.js",
+		"**/*/scripts/vite-zod-locale-plugin.js"
+	],
+	"rules": {
+		"no-unexpected-multiline": "error",
+		"constructor-super": "error",
+		"for-direction": "error",
+		"getter-return": "error",
+		"no-async-promise-executor": "error",
+		"no-case-declarations": "error",
+		"no-class-assign": "error",
+		"no-compare-neg-zero": "error",
+		"no-cond-assign": "error",
+		"no-const-assign": "error",
+		"no-constant-binary-expression": "error",
+		"no-constant-condition": "error",
+		"no-control-regex": "error",
+		"no-debugger": "error",
+		"no-delete-var": "error",
+		"no-dupe-class-members": "error",
+		"no-dupe-else-if": "error",
+		"no-dupe-keys": "error",
+		"no-duplicate-case": "error",
+		"no-empty": "error",
+		"no-empty-character-class": "error",
+		"no-empty-pattern": "error",
+		"no-empty-static-block": "error",
+		"no-ex-assign": "error",
+		"no-extra-boolean-cast": "error",
+		"no-func-assign": "error",
+		"no-global-assign": "error",
+		"no-import-assign": "error",
+		"no-invalid-regexp": "error",
+		"no-irregular-whitespace": "error",
+		"no-loss-of-precision": "error",
+		"no-misleading-character-class": "error",
+		"no-new-native-nonconstructor": "error",
+		"no-nonoctal-decimal-escape": "error",
+		"no-obj-calls": "error",
+		"no-prototype-builtins": "error",
+		"no-redeclare": "error",
+		"no-regex-spaces": "error",
+		"no-self-assign": "error",
+		"no-setter-return": "error",
+		"no-shadow-restricted-names": "error",
+		"no-sparse-arrays": "error",
+		"no-this-before-super": "error",
+		"no-undef": "error",
+		"no-unreachable": "error",
+		"no-unsafe-finally": "error",
+		"no-unsafe-negation": "error",
+		"no-unsafe-optional-chaining": "error",
+		"no-unused-labels": "error",
+		"no-unused-private-class-members": "error",
+		"no-unused-vars": [
+			"error",
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_",
+				"caughtErrorsIgnorePattern": "^_",
+				"fix": {
+					"imports": "safe-fix",
+					"variables": "off"
+				}
+			}
+		],
+		"no-useless-backreference": "error",
+		"no-useless-catch": "error",
+		"no-useless-escape": "error",
+		"no-with": "error",
+		"require-yield": "error",
+		"use-isnan": "error",
+		"valid-typeof": "error",
+		"no-throw-literal": "error",
+		"no-array-constructor": "error",
+		"no-unused-expressions": "error",
+
+
+		"@typescript-eslint/no-duplicate-enum-values": "error",
+		"@typescript-eslint/no-empty-object-type": "error",
+		"@typescript-eslint/no-extra-non-null-assertion": "error",
+		"@typescript-eslint/no-misused-new": "error",
+		"@typescript-eslint/no-namespace": "error",
+		"@typescript-eslint/no-non-null-asserted-optional-chain": "error",
+		"@typescript-eslint/no-require-imports": "error",
+		"@typescript-eslint/no-this-alias": "error",
+		"@typescript-eslint/no-unnecessary-type-constraint": "error",
+		"@typescript-eslint/no-unsafe-declaration-merging": "error",
+		"@typescript-eslint/no-unsafe-function-type": "error",
+		"@typescript-eslint/no-wrapper-object-types": "error",
+		"@typescript-eslint/prefer-as-const": "error",
+		"@typescript-eslint/prefer-namespace-keyword": "error",
+		"@typescript-eslint/triple-slash-reference": "error",
+		"@typescript-eslint/no-deprecated": "error",
+		"@typescript-eslint/consistent-type-exports": [
+			"error",
+			{ "fixMixedExportsWithInlineTypeSpecifier": true }
+		],
+		"@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+
+
+		"no-restricted-globals": [
+			"error",
+			{
+				"name": "structuredClone",
+				"message": "Use structuredClone from @svelte-draw/util instead"
+			}
+		],
+
+		"no-restricted-imports": [
+			"error",
+			{
+				"paths": [
+					{
+						"name": "lodash",
+						"message": "The main `lodash` package is CommonJS and does not tree-shake. Use a deep import (e.g. `import throttle from 'lodash/throttle'`), `lodash-es`, a per-method package, or inline the helper."
+					}
+				]
+			}
+		],
+
+		"svelte-draw/no-export-star": "error",
+		"svelte-draw/no-internal-imports": "error",
+		"svelte-draw/tagged-components": "error",
+		"svelte-draw/prefer-class-methods": "error",
+		"svelte-draw/tsdoc-param-matching": "error",
+		"svelte-draw/no-whilst": "error",
+		"svelte-draw/no-tiptap-default-import": "error",
+		"svelte-draw/no-setter-getter": "error",
+		"svelte-draw/no-direct-storage": "error",
+		"svelte-draw/no-path2d-roundrect": "error",
+		"svelte-draw/no-exported-arrow-const": "error",
+		"svelte-draw/no-focused-tests": "error",
+		"svelte-draw/enforce-default-message": ["error", "literal"],
+		"svelte-draw/method-signature-style": "error",
+		"svelte-draw/claude-agents-pairing": "error"
+	},
+	"overrides": [
+		{
+			"files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+			"rules": {
+				"@typescript-eslint/explicit-module-boundary-types": "off",
+				"no-console": ["error", { "allow": ["warn", "error"] }],
+				"constructor-super": "off",
+				"getter-return": "off",
+				"no-class-assign": "off",
+				"no-const-assign": "off",
+				"no-dupe-class-members": "off",
+				"no-dupe-keys": "off",
+				"no-func-assign": "off",
+				"no-import-assign": "off",
+				"no-new-native-nonconstructor": "off",
+				"no-obj-calls": "off",
+				"no-redeclare": "off",
+				"no-setter-return": "off",
+				"no-this-before-super": "off",
+				"no-undef": "off",
+				"no-unreachable": "off",
+				"no-unsafe-negation": "off",
+				"no-with": "off",
+				"no-var": "error",
+				"prefer-const": "error",
+				"prefer-rest-params": "error",
+				"prefer-spread": "error"
+			}
+		},
+		{
+			"files": ["packages/**/*", "apps/**/*", "internal/**/*", "templates/**/*"],
+			"rules": {
+				"svelte-draw/no-undeclared-dependencies": "error"
+			}
+		},
+		{
+			"files": ["packages/editor/**/*", "packages/svelte-draw/**/*", "packages/utils/**/*"],
+			"rules": {
+				"no-restricted-globals": [
+					"error",
+					{
+						"name": "fetch",
+						"message": "Use the fetch from @svelte-draw/util instead."
+					},
+					{
+						"name": "Image",
+						"message": "Use the Image from @svelte-draw/util instead."
+					},
+					{
+						"name": "setTimeout",
+						"message": "Use the timers from editor.timers instead."
+					},
+					{
+						"name": "setInterval",
+						"message": "Use the timers from editor.timers instead."
+					},
+					{
+						"name": "requestAnimationFrame",
+						"message": "Use the timers from editor.timers instead."
+					},
+					{
+						"name": "structuredClone",
+						"message": "Use structuredClone from @svelte-draw/util instead"
+					}
+				],
+				"svelte-draw/no-restricted-properties": [
+					"error",
+					[
+						{
+							"object": "window",
+							"property": "fetch",
+							"message": "Use the fetch from @svelte-draw/util instead."
+						},
+						{
+							"object": "window",
+							"property": "Image",
+							"message": "Use the Image from @svelte-draw/util instead."
+						},
+						{
+							"object": "window",
+							"property": "setTimeout",
+							"message": "Use the timers from editor.timers instead."
+						},
+						{
+							"object": "window",
+							"property": "setInterval",
+							"message": "Use the timers from editor.timers instead."
+						},
+						{
+							"object": "window",
+							"property": "requestAnimationFrame",
+							"message": "Use the timers from editor.timers instead."
+						}
+					]
+				],
+				"svelte-draw/img-referrer-policy": "error"
+			}
+		},
+		{
+			"files": ["apps/dotcom/client/**/*"],
+			"rules": {
+				"no-restricted-globals": [
+					"error",
+					{
+						"name": "fetch",
+						"message": "Use the fetch from @svelte-draw/util instead."
+					},
+					{
+						"name": "Image",
+						"message": "Use the Image from @svelte-draw/util instead."
+					},
+					{
+						"name": "structuredClone",
+						"message": "Use structuredClone from @svelte-draw/util instead"
+					}
+				],
+				"svelte-draw/no-restricted-properties": [
+					"error",
+					[
+						{
+							"object": "window",
+							"property": "fetch",
+							"message": "Use the fetch from @svelte-draw/util instead."
+						},
+						{
+							"object": "window",
+							"property": "Image",
+							"message": "Use the Image from @svelte-draw/util instead."
+						},
+						{
+							"object": "crypto",
+							"property": "randomUUID",
+							"message": "Please use the makeUUID util instead."
+						}
+					]
+				]
+			}
+		},
+		{
+			"files": ["apps/dotcom/client/src/tla/**/*"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"paths": [
+							{
+								"name": "react-intl",
+								"importNames": ["FormattedMessage", "defineMessages"],
+								"message": "Use F and defineMessages from 'svelte-draw' instead. The SDK's F renders the pseudo-locales and the marker span the language-debug overlay looks for; react-intl's does neither."
+							},
+							{
+								"name": "lodash",
+								"message": "The main `lodash` package is CommonJS and does not tree-shake. Use a deep import (e.g. `import throttle from 'lodash/throttle'`), `lodash-es`, a per-method package, or inline the helper."
+							}
+						]
+					}
+				],
+				"svelte-draw/jsx-no-literals": "error"
+			}
+		},
+		{
+			"files": ["**/scripts/**/*"],
+			"rules": {
+				"@typescript-eslint/no-require-imports": "off"
+			}
+		},
+		{
+			"files": ["internal/scripts/**/*"],
+			"rules": {
+				"svelte-draw/no-export-star": "off"
+			}
+		},
+		{
+			"files": ["internal/scripts/process-compose-bin.cjs"],
+			"env": { "node": true },
+			"globals": { "fetch": "readonly" }
+		},
+		{
+			"files": ["apps/mcp-app/**/*"],
+			"rules": {
+				"svelte-draw/no-export-star": "off"
+			}
+		},
+		{
+			"files": ["packages/**/*"],
+			"rules": {
+				"svelte-draw/no-bare-translation-key": "error"
+			}
+		},
+		{
+			"files": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts"],
+			"rules": {
+				"svelte-draw/no-bare-translation-key": "off",
+				"svelte-draw/no-restricted-properties": "off",
+				"no-restricted-globals": "off"
+			}
+		},
+		{
+			"files": ["internal/**/*", "templates/simple-server-example/**/*"],
+			"rules": {
+				"no-console": "off"
+			}
+		},
+		{
+			"files": ["apps/examples/**/*"],
+			"rules": {
+				"svelte-draw/no-setter-getter": "off",
+				"svelte-draw/no-direct-storage": "off",
+				"svelte-draw/img-referrer-policy": "off"
+			}
+		},
+		{
+			"files": [
+				"packages/svelte/**/*.svelte.ts",
+				"packages/svelte-draw/**/*.svelte.ts",
+				"packages/sync/**/*.svelte.ts",
+				"packages/mentions/**/*.svelte.ts"
+			],
+			"rules": {
+				"svelte-draw/no-setter-getter": "off"
+			}
+		},
+		{
+			"files": ["apps/**/*.svelte.ts", "templates/**/*.svelte.ts"],
+			"rules": {
+				"svelte-draw/no-setter-getter": "off"
+			}
+		},
+		{
+			"files": [
+				"apps/**/src/routes/**/+*.ts",
+				"apps/**/src/hooks.ts",
+				"apps/**/src/hooks.client.ts",
+				"apps/**/src/hooks.server.ts",
+				"templates/**/src/routes/**/+*.ts"
+			],
+			"rules": {
+				"svelte-draw/no-exported-arrow-const": "off"
+			}
+		},
+		{
+			"files": ["apps/docs/**/*"],
+			"rules": {
+				"svelte-draw/no-direct-storage": "off"
+			}
+		},
+		{
+			"files": ["packages/svelte-draw/src/lib/ui/hooks/useLocalStorageState.svelte.test.ts"],
+			"rules": {
+				"svelte-draw/no-direct-storage": "off"
+			}
+		},
+		{
+			"files": ["templates/**/*"],
+			"rules": {
+				"svelte-draw/prefer-class-methods": "off",
+				"svelte-draw/no-setter-getter": "off",
+				"svelte-draw/no-direct-storage": "off",
+				"svelte-draw/img-referrer-policy": "off",
+				"no-console": "off",
+				"svelte-draw/method-signature-style": "off"
+			}
+		}
+	]
+}
